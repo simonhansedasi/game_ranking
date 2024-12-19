@@ -79,7 +79,8 @@
             body: JSON.stringify({
                 game_string: gameType,  // Pass game type to identify the game
                 puzzle_string: puzzleString
-            })
+            }),
+            credentials:'include'
         })
         .then(response => response.json())
         .then(data => {
