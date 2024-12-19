@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Score Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+        }
+        .score {
+            font-size: 20px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Game Score Dashboard</h1>
+    
+    <h2>Today's Connections Puzzle Scoring</h2>
+    <div class="rank" id="connectionsScore"></div>
+
+    <div class="score" id="connectionsScore"></div>
+
+    <textarea id="connectionsString" rows="4" cols="50" placeholder="Enter the connections puzzle string here..."></textarea>
+    <button onclick="submitScore('connections')">Submit Score</button>
+
+
+
+    
+    
+    
+    
+    <h2>Today's Strands Puzzle Scoring</h2>
+    <div class="rank" id="strandsScore"></div>
+
+    <div class="score" id="strandsScore"></div>
+
+    <ul id="rankings"></ul>
+    <textarea id="strandsString" rows="4" cols="50" placeholder="Enter the strands puzzle string here..."></textarea>
+    <button onclick="submitScore('strands')">Submit Score</button>
+    
+
+    
+    
+    
+
+    
+    
+    
+<script>
+    function submitScore(gameType) {
+        // Determine the puzzle string based on the game type
+        let puzzleString = '';
+        let scoreElementId = '';
+        
+        if (gameType === 'connections') {
+            puzzleString = document.getElementById("connectionsString").value;
+            scoreElementId = "connectionsScore";
+        } else if (gameType === 'strands') {
+            puzzleString = document.getElementById("strandsString").value;
+            scoreElementId = "strandsScore";
+        }
+
+        // Send the puzzle string to the appropriate endpoint
+        fetch(`https://550fb17db6d8.ngrok.app/score_game`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                game_string: gameType,  // Pass game type to identify the game
+                puzzle_string: puzzleString
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById(scoreElementId).innerHTML = `Today's Puzzle rank: ${data.rank}<br>Your score: ${data.score}`;
+        })
+        .catch(error => {
+            document.getElementById(scoreElementId).textContent = `Error: ${error.message}`;
+            console.error('Error:', error);
+        });
+    }
+</script>
+
+</body>
+</html>
