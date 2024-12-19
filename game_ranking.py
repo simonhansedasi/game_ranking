@@ -86,7 +86,7 @@ def init_db():
             game_type TEXT NOT NULL,
             puzzle_number INTEGER NOT NULL,
             score INTEGER NOT NULL,
-            ip_address TEXT NOT NULL,
+            session_id TEXT NOT NULL,
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ''')
@@ -132,26 +132,26 @@ def update_scores(scores):
     
     return
 # Insert a score into the database
-def insert_score(game_type, puzzle_number, score, ip_address):
+def insert_score(game_type, puzzle_number, score, session_id):
     conn = sqlite3.connect('rankings.db')
     cursor = conn.cursor()
 
     cursor.execute('''
-        INSERT INTO puzzles (game_type, puzzle_number, score,ip_address)
+        INSERT INTO puzzles (game_type, puzzle_number, score, session_id)
         VALUES (?, ?, ?, ?)
-    ''', (game_type, puzzle_number, score, ip_address))
+    ''', (game_type, puzzle_number, score, session_id))
     
     conn.commit()
     conn.close()
     
     
     
-def score_exists(ip_address, puzzle_number):
+def score_exists(session_id, puzzle_number ):
     conn = sqlite3.connect('rankings.db')
     c = conn.cursor()
     
     # Query to check if a score for this player and puzzle already exists
-    c.execute('SELECT COUNT(*) FROM puzzles WHERE ip_address = ? AND puzzle_number = ?', (ip_address, puzzle_number))
+    c.execute('SELECT COUNT(*) FROM puzzles WHERE session_id = ? AND puzzle_number = ?', (session_id, puzzle_number))
     count = c.fetchone()[0]
     
     conn.close()

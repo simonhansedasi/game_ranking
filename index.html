@@ -57,6 +57,23 @@
     
     
 <script>
+    
+    // Check if a session ID already exists in localStorage
+    if (!localStorage.getItem('session_id')) {
+        fetch('https://550fb17db6d8.ngrok.app/get_session_id', {
+            method: 'GET',
+            credentials: 'include'  // Include cookies for session management
+        })
+        .then(response => response.json())
+        .then(data => {
+            localStorage.setItem('session_id', data.session_id);
+        })
+        .catch(error => console.error('Error fetching session ID:', error));
+    }
+    
+    
+    
+    
     function submitScore(gameType) {
         // Determine the puzzle string based on the game type
         let puzzleString = '';
@@ -69,6 +86,8 @@
             puzzleString = document.getElementById("strandsString").value;
             scoreElementId = "strandsScore";
         }
+        const session_id = localStorage.getItem('session_id');
+
 
         // Send the puzzle string to the appropriate endpoint
         fetch(`https://550fb17db6d8.ngrok.app/score_game`, {
@@ -79,6 +98,8 @@
             body: JSON.stringify({
                 game_string: gameType,  // Pass game type to identify the game
                 puzzle_string: puzzleString
+                session_id: session_id
+
             }),
             credentials:'include'
         })
