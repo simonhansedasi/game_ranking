@@ -57,20 +57,25 @@ def score_game():
     
     session_id = data.get('session_id')
     
-    
+    print('whaaaa')
     # print(game_string)
     game, puzzle_number, clean_string = gr.clean_puzzle_input(game_string)
+    print('data cleaned')
     if gr.score_exists(session_id, puzzle_number):
-        return jsonify({'message': 'Score for this player and puzzle already submitted'}), 400
+        print('no can do siree')
+        return jsonify({'score': 'Score for this player and puzzle already submitted'}), 400
     
     
     current_puzzle_number = gr.get_current_puzzle(game)
     if not current_puzzle_number:
-        return jsonify({'error': 'Game not found'}), 400
+        print('wrong day?')
+        return jsonify({'score': 'Game not found'}), 400
     
     
     if puzzle_number != current_puzzle_number:
-        return jsonify({'error': 'puzzle does not match current day'}), 400
+        print(current_puzzle_number)
+        print('wrong day')
+        return jsonify({'score': 'puzzle does not match current day'}), 400
     
     if game == 'connections':
         score = gr.score_connections_puzzle(clean_string)
@@ -97,7 +102,9 @@ def get_ranking():
 
     if rank is None:
         return jsonify({'error': 'No ranking data available'}), 404
-
+    # Convert NumPy int64 to Python int
+    if isinstance(rank, (np.integer, np.floating)):
+        rank = rank.item()
     return jsonify({'rank': rank})
 
 

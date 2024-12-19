@@ -115,7 +115,11 @@ def init_db():
             PRIMARY KEY (game_type, puzzle_number)
         )
     ''')
-
+    # Prepopulate rankings with default values (e.g., ranking of 0)
+    cursor.execute('''
+        INSERT OR IGNORE INTO rankings (game_type, puzzle_number, ranking)
+        VALUES ('connections', 1, 0), ('strands', 1, 0)
+    ''')
 
     conn.commit()
     conn.close()
@@ -179,8 +183,8 @@ def get_current_puzzle(game_type):
 
     # Calculate the current puzzle number
     days_elapsed = (date.today() - start_date).days
-    current_puzzle_number = start_puzzle_number + days_elapsed
-
+    current_puzzle_number = str(start_puzzle_number + days_elapsed)
+    
     return current_puzzle_number
 
 
@@ -254,11 +258,30 @@ def get_ranking(game_type, puzzle_number):
 
 
 
+# def get_current_rank(game_type):
+#     conn = sqlite3.connect('rankings.db')
+#     cursor = conn.cursor()
+#     cursor.execute("SELECT ranking FROM rankings WHERE game_type = ? ORDER BY timestamp DESC LIMIT 1", (game_type,))
+#     row = cursor.fetchone()
+#     conn.close()
+
+#     return row[0] if row else 0.0
+
+
 def get_current_rank(game_type):
     conn = sqlite3.connect('rankings.db')
     cursor = conn.cursor()
-    cursor.execute("SELECT ranking FROM rankings WHERE game_type = ? ORDER BY timestamp DESC LIMIT 1", (game_type,))
+
+    # Check if a puzzle date exists for the game type
+    cursor.execute("""
+        SELECT r.ranking
+        FROM rankings r
+        JOIN puzzle_dates pd ON r.game_type = pd.game_type AND r.puzzle_number = pd.puzzle_number
+        WHERE r.game_type = ?
+        ORDER BY r.timestamp DESC LIMIT 1
+    """, (game_type,))
+
     row = cursor.fetchone()
     conn.close()
 
-    return row[0] if row else 0.0
+    return row[0] if row else 0

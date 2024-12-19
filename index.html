@@ -80,7 +80,7 @@ function ensureSessionID() {
 
     if (!existingSessionID) {
         // Fetch a new session ID only if it doesn't exist
-        fetch('https://381e7afc0fdb.ngrok.app/get_session_id', {
+        fetch('https://550fb17db6d8.ngrok.app/get_session_id', {
             method: 'GET',
             credentials: 'include', // Include cookies for session management
         })
@@ -106,7 +106,7 @@ ensureSessionID();
 function fetchAndDisplayRank(gameType) {
     const rankElementId = gameType === 'connections' ? 'currentConnectionsRank' : 'currentStrandsRank';
 
-    fetch(`https://381e7afc0fdb.ngrok.app/get_ranking?game_type=${gameType}`, {
+    fetch(`https://550fb17db6d8.ngrok.app/get_ranking?game_type=${gameType}`, {
         method: 'GET',
         credentials: 'include',
     })
@@ -127,19 +127,24 @@ function fetchAndDisplayRank(gameType) {
 function submitScore(gameType) {
     let puzzleString = '';
     let scoreElementId = '';
+    let rankElementId = '';
 
     if (gameType === 'connections') {
         puzzleString = document.getElementById("connectionsString").value;
         scoreElementId = "connectionsScore";
+        rankElementId = "currentConnectionsRank";
+
     } else if (gameType === 'strands') {
         puzzleString = document.getElementById("strandsString").value;
         scoreElementId = "strandsScore";
+        rankElementId = "currentStrandsRank";
+
     }
 
     const session_id = getCookie('session_id'); // Retrieve session ID from cookies
 
     // Send the puzzle string to the appropriate endpoint
-    fetch(`https://381e7afc0fdb.ngrok.app/score_game`, {
+    fetch(`https://550fb17db6d8.ngrok.app/score_game`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -154,6 +159,8 @@ function submitScore(gameType) {
         .then(response => response.json())
         .then(data => {
             document.getElementById(scoreElementId).innerHTML = `Your score: ${data.score}`;
+                // Fetch and update the rank after submitting the score
+        fetchAndDisplayRank(gameType); // This will refresh the rank message
         })
         .catch(error => {
             document.getElementById(scoreElementId).textContent = `Error: ${error.message}`;
