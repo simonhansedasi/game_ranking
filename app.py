@@ -3,6 +3,7 @@ from flask_cors import CORS
 import uuid
 import game_ranking as gr
 import secrets  # This is used for generating a secret key
+import numpy as np
 
 app = Flask(__name__)
 CORS(app, support_credentials = True, resources={r'/*': {'origins': ['http://127.0.0.1:4000', 'https://simonhansedasi.github.io']}})
@@ -32,26 +33,44 @@ def ensure_session_id():
         session['session_id'] = str(uuid.uuid4())
     print(f"Session ID: {session['session_id']}")  # Debugging
     
+    
+    
+    
 @app.route('/get_session_id', methods=['GET'])
 def get_session_id():
-    return jsonify({'session_id': session['session_id']})
+    existing_session_id = request.cookies.get('session_id')
+
+    if existing_session_id:
+        return jsonify({'session_id': existing_session_id})
+
+    # Generate a new session ID if one doesn't exist
+    new_session_id = gr.generate_unique_session_id()
+    response = jsonify({'session_id': new_session_id})
+    response.set_cookie('session_id', new_session_id, max_age=30*24*60*60, secure=True)
+    return response
         
 @app.route('/score_game', methods=['POST'])
 def score_game():
     data = request.get_json()
-    ip_address = request.remote_addr
+    # ip_address = request.remote_addr
     game_string = data.get("puzzle_string")
     
-    session_id = session['session_id']
+    session_id = data.get('session_id')
     
     
-    print(game_string)
+    # print(game_string)
     game, puzzle_number, clean_string = gr.clean_puzzle_input(game_string)
     if gr.score_exists(session_id, puzzle_number):
         return jsonify({'message': 'Score for this player and puzzle already submitted'}), 400
     
     
+    current_puzzle_number = gr.get_current_puzzle(game)
+    if not current_puzzle_number:
+        return jsonify({'error': 'Game not found'}), 400
     
+    
+    if puzzle_number != current_puzzle_number:
+        return jsonify({'error': 'puzzle does not match current day'}), 400
     
     if game == 'connections':
         score = gr.score_connections_puzzle(clean_string)
@@ -66,10 +85,25 @@ def score_game():
     
     return jsonify({"score": score, "rank" : rank})
 
+@app.route('/get_ranking', methods=['GET'])
+def get_ranking():
+    game_type = request.args.get('game_type')
+    
+    if not game_type:
+        return jsonify({'error': 'Game type is required'}), 400
 
+    # Query the database to get the current ranking for the game type
+    rank = np.round(gr.get_current_rank(game_type),2)  # Implement this function to fetch the ranking
+
+    if rank is None:
+        return jsonify({'error': 'No ranking data available'}), 404
+
+    return jsonify({'rank': rank})
 
 
 if __name__ == '__main__':
     gr.init_db()
-
+    # Populate puzzles for two games (customize as needed)
+    gr.populate_puzzle_dates(game_type="connections", start_puzzle_number=557, start_date="2024-12-19", num_days=999)
+    gr.populate_puzzle_dates(game_type="strands", start_puzzle_number=291, start_date="2024-12-19", num_days=999)
     app.run(debug=True, port = 5005)

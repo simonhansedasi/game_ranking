@@ -1,4 +1,10 @@
 import sqlite3
+import uuid
+from datetime import date, timedelta
+
+
+def generate_unique_session_id():
+    return str(uuid.uuid4())
 
 
 
@@ -87,6 +93,7 @@ def init_db():
             puzzle_number INTEGER NOT NULL,
             score INTEGER NOT NULL,
             session_id TEXT NOT NULL,
+            release_date DATE,
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ''')
@@ -96,41 +103,87 @@ def init_db():
             game_type TEXT,
             puzzle_number INTEGER,
             ranking INTEGER,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (game_type, puzzle_number)
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS puzzle_dates (
+            game_type TEXT NOT NULL,
+            puzzle_number INTEGER NOT NULL,
+            puzzle_date DATE NOT NULL,
             PRIMARY KEY (game_type, puzzle_number)
         )
     ''')
 
+
     conn.commit()
     conn.close()
-
-# Retrieve the leaderboard scores from the database
-def get_scores():
+    
+    
+def create_puzzle_dates_table():
+    # Connect to the database
     conn = sqlite3.connect('rankings.db')
     cursor = conn.cursor()
 
-    cursor.execute('''
-        SELECT * FROM puzzles ORDER BY score DESC
-    ''')
+    # Create the puzzle_dates table
 
-    scores = cursor.fetchall()
+
+    conn.commit()
     conn.close()
-    # print(scores)
-    return scores   
 
-def update_scores(scores):
-    
-    game = {}
-    score = 0
-    
-    # for player in scores
     
     
+def populate_puzzle_dates(game_type, start_puzzle_number, start_date, num_days):
+    # Connect to the database
+    conn = sqlite3.connect('rankings.db')
+    cursor = conn.cursor()
+
+    # Generate puzzle dates for the specified range
+    current_date = date.fromisoformat(start_date)
+    for i in range(num_days):
+        puzzle_number = start_puzzle_number + i
+        puzzle_date = current_date + timedelta(days=i)
+        try:
+            cursor.execute("""
+                INSERT INTO puzzle_dates (game_type, puzzle_number, puzzle_date)
+                VALUES (?, ?, ?)
+            """, (game_type, puzzle_number, puzzle_date.isoformat()))
+        except sqlite3.IntegrityError:
+            continue
+            # print(f"Skipping duplicate entry for {game_type} puzzle {puzzle_number} on {puzzle_date}.")
+
+    conn.commit()
+    conn.close()
     
-    
-    
-    
-    
-    return
+
+def get_current_puzzle(game_type):
+    conn = sqlite3.connect('rankings.db')
+    cursor = conn.cursor()
+
+    # Retrieve the starting puzzle and date for the game
+    cursor.execute("""
+        SELECT puzzle_date, puzzle_number
+        FROM puzzle_dates
+        WHERE game_type = ?
+        LIMIT 1
+    """, (game_type,))
+    result = cursor.fetchone()
+    conn.close()
+
+    if not result:
+        return None
+
+    start_date, start_puzzle_number = result
+    start_date = date.fromisoformat(start_date)
+
+    # Calculate the current puzzle number
+    days_elapsed = (date.today() - start_date).days
+    current_puzzle_number = start_puzzle_number + days_elapsed
+
+    return current_puzzle_number
+
+
 # Insert a score into the database
 def insert_score(game_type, puzzle_number, score, session_id):
     conn = sqlite3.connect('rankings.db')
@@ -201,3 +254,11 @@ def get_ranking(game_type, puzzle_number):
 
 
 
+def get_current_rank(game_type):
+    conn = sqlite3.connect('rankings.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT ranking FROM rankings WHERE game_type = ? ORDER BY timestamp DESC LIMIT 1", (game_type,))
+    row = cursor.fetchone()
+    conn.close()
+
+    return row[0] if row else 0.0

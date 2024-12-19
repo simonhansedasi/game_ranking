@@ -26,7 +26,7 @@
     <h1>Game Score Dashboard</h1>
     
     <h2>Today's Connections Puzzle Scoring</h2>
-    <div class="rank" id="connectionsScore"></div>
+    <div id="currentConnectionsRank"></div>
 
     <div class="score" id="connectionsScore"></div>
 
@@ -40,7 +40,7 @@
     
     
     <h2>Today's Strands Puzzle Scoring</h2>
-    <div class="rank" id="strandsScore"></div>
+    <div id="currentStrandsRank"></div>
 
     <div class="score" id="strandsScore"></div>
 
@@ -57,61 +57,114 @@
     
     
 <script>
-    
-    // Check if a session ID already exists in localStorage
-    if (!localStorage.getItem('session_id')) {
-        fetch('https://550fb17db6d8.ngrok.app/get_session_id', {
+    // Helper function to set a cookie
+function setCookie(name, value, days) {
+    const date = new Date();
+    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000); // Set expiration in milliseconds
+    const expires = `expires=${date.toUTCString()}`;
+    document.cookie = `${name}=${value}; ${expires}; path=/; Secure`;
+}
+// Helper function to get a cookie by name
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+}
+
+
+
+// Ensure a session ID exists, creating it only if necessary
+function ensureSessionID() {
+    const existingSessionID = getCookie('session_id');
+
+    if (!existingSessionID) {
+        // Fetch a new session ID only if it doesn't exist
+        fetch('https://381e7afc0fdb.ngrok.app/get_session_id', {
             method: 'GET',
-            credentials: 'include'  // Include cookies for session management
+            credentials: 'include', // Include cookies for session management
         })
-        .then(response => response.json())
-        .then(data => {
-            localStorage.setItem('session_id', data.session_id);
-        })
-        .catch(error => console.error('Error fetching session ID:', error));
+            .then(response => response.json())
+            .then(data => {
+                setCookie('session_id', data.session_id, 30); // Persist for 30 days
+                console.log('Session ID created and saved:', data.session_id);
+            })
+            .catch(error => console.error('Error fetching session ID:', error));
+    } else {
+        console.log('Session ID already exists:', existingSessionID);
     }
-    
-    
-    
-    
-    function submitScore(gameType) {
-        // Determine the puzzle string based on the game type
-        let puzzleString = '';
-        let scoreElementId = '';
-        
-        if (gameType === 'connections') {
-            puzzleString = document.getElementById("connectionsString").value;
-            scoreElementId = "connectionsScore";
-        } else if (gameType === 'strands') {
-            puzzleString = document.getElementById("strandsString").value;
-            scoreElementId = "strandsScore";
-        }
-        const session_id = localStorage.getItem('session_id');
+}
 
+// Ensure session ID on page load
+ensureSessionID();
 
-        // Send the puzzle string to the appropriate endpoint
-        fetch(`https://550fb17db6d8.ngrok.app/score_game`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                game_string: gameType,  // Pass game type to identify the game
-                puzzle_string: puzzleString
-                session_id: session_id
+    
+    
+    
+    
+// Function to fetch and display the current ranking
+function fetchAndDisplayRank(gameType) {
+    const rankElementId = gameType === 'connections' ? 'currentConnectionsRank' : 'currentStrandsRank';
 
-            }),
-            credentials:'include'
-        })
+    fetch(`https://381e7afc0fdb.ngrok.app/get_ranking?game_type=${gameType}`, {
+        method: 'GET',
+        credentials: 'include',
+    })
         .then(response => response.json())
         .then(data => {
-            document.getElementById(scoreElementId).innerHTML = `Today's Puzzle rank: ${data.rank}<br>Your score: ${data.score}`;
+            if (data.rank) {
+                document.getElementById(rankElementId).innerHTML = `Current rank: ${data.rank}`;
+            } else {
+                document.getElementById(rankElementId).innerHTML = 'Puzzle not yet ranked';
+            }
+        })
+        .catch(error => {
+            console.error(`Error fetching ${gameType} ranking:`, error);
+            document.getElementById(rankElementId).innerHTML = 'Error fetching ranking.';
+        });
+}
+// Function to submit the score
+function submitScore(gameType) {
+    let puzzleString = '';
+    let scoreElementId = '';
+
+    if (gameType === 'connections') {
+        puzzleString = document.getElementById("connectionsString").value;
+        scoreElementId = "connectionsScore";
+    } else if (gameType === 'strands') {
+        puzzleString = document.getElementById("strandsString").value;
+        scoreElementId = "strandsScore";
+    }
+
+    const session_id = getCookie('session_id'); // Retrieve session ID from cookies
+
+    // Send the puzzle string to the appropriate endpoint
+    fetch(`https://381e7afc0fdb.ngrok.app/score_game`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            game_string: gameType, // Pass game type to identify the game
+            puzzle_string: puzzleString,
+            session_id: session_id, // Send the persistent session ID
+        }),
+        credentials: 'include',
+    })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById(scoreElementId).innerHTML = `Your score: ${data.score}`;
         })
         .catch(error => {
             document.getElementById(scoreElementId).textContent = `Error: ${error.message}`;
             console.error('Error:', error);
         });
-    }
+}
+    window.onload = function () {
+    fetchAndDisplayRank('connections');
+    fetchAndDisplayRank('strands');
+};
+
 </script>
 
 </body>
