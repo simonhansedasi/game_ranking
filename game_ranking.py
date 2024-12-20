@@ -1,6 +1,14 @@
 import sqlite3
 import uuid
 from datetime import date, timedelta
+import numpy as np
+import matplotlib.pyplot as plt
+import os
+
+
+
+
+
 
 
 def generate_unique_session_id():
@@ -285,3 +293,108 @@ def get_current_rank(game_type):
     conn.close()
 
     return row[0] if row else 0
+
+
+
+def get_recent_scores(puzzle_number = None, db_file = 'rankings.db'):
+    conn = sqlite3.connect(db_file)
+    cursor = conn.cursor()
+
+    query = '''
+    WITH recent_puzzles AS (
+        SELECT DISTINCT puzzle_number
+        FROM puzzles
+        ORDER BY timestamp DESC
+        LIMIT 5
+    )
+    SELECT p.game_type, p.puzzle_number, p.score
+    FROM puzzles p
+    INNER JOIN recent_puzzles rp ON p.puzzle_number = rp.puzzle_number
+    '''
+    if puzzle_number is not None:
+        query += ' WHERE p.puzzle_number = ?'
+        cursor.execute(query, (puzzle_number,))
+    else:
+        cursor.execute(query)
+        
+    rows = cursor.fetchall()
+
+    column_names = [description[0] for description in cursor.description]
+
+    conn.close()
+    
+    return rows, column_names
+
+
+
+
+def organize_data(rows):
+    strands = {}
+    connecs = {}
+    for item in rows:
+
+        game = item[0]
+        puzzle_number = item[1]
+        score = item[2]
+
+        if game == 'strands':
+            if puzzle_number not in strands:
+                strands[puzzle_number] = []
+            strands[puzzle_number].append(score)
+
+        if game == 'connections':
+            if puzzle_number not in connecs:
+                connecs[puzzle_number] = []
+            connecs[puzzle_number].append(score)
+    return strands, connecs
+
+
+def plot_score_data(data,game):
+
+
+    labels = list(data.keys())[::-1]
+    values = [data[key] for key in labels]
+    iqrs = []
+    medians = []
+    q1s = []
+    q2s = []
+    for scores in values:
+
+        q1 = np.percentile(scores, 75)
+        q2 = np.percentile(scores, 25)
+        iqr = q1 - q2
+
+        q1s.append(q1)
+        q2s.append(q2)
+        iqrs.append(iqr)
+        medians.append(np.median(scores))
+    x_positions = np.arange(len(labels))
+
+    plt.boxplot(
+        values, 
+        patch_artist=True,               
+        notch=False,                     
+        vert=True,                       
+        widths=0.5,                      
+        boxprops=dict(facecolor="white", color="black"),  
+        medianprops=dict(color = 'black',linewidth=2),      
+        whiskerprops=dict(linewidth=1.5),   
+        capprops=dict(color="black", linewidth=1.5),       
+        flierprops=dict(marker="o", color="blue", alpha=0.5)  
+    )
+    if game == 'Strands':
+        plt.ylim([-30, 40])
+    if game == 'Connections':
+        plt.ylim([-70, 60])
+    plt.xticks(ticks=np.arange(1, len(labels) + 1), labels=labels, fontsize=12)  
+    plt.xlabel('Puzzle Number', fontsize=14)
+    plt.ylabel('Scores', fontsize=14)
+    plt.title(f'{game} Recent Scores', fontsize=16)
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    
+    output_path = f'static/images/{game}_recent_scores.png'
+    
+    
+    plt.savefig(output_path, bbox_inches = 'tight')
+    plt.close()
+    return 

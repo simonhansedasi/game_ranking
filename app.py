@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, session
+from flask import Flask, request, jsonify, session, render_template
 from flask_cors import CORS
 import uuid
 import game_ranking as gr
@@ -6,8 +6,9 @@ import secrets  # This is used for generating a secret key
 import numpy as np
 
 app = Flask(__name__)
-CORS(app, support_credentials = True, resources={r'/*': {'origins': ['http://127.0.0.1:4000', 'https://simonhansedasi.github.io']}})
+CORS(app, support_credentials = True, resources={r'/*': {'origins': 'https://simonhansedasi.github.io'}})
 
+# CORS(app, support_credentials = True, resources={r'/*': {'origins': 'https://127.0.0.1:4000'}})
 
 app.config['PREFERRED_URL_SCHEME'] = 'https'
 
@@ -19,7 +20,8 @@ app.permanent_session_lifetime = 60 * 60 * 24 * 30  # 30 days
 
 @app.after_request
 def add_cors_headers(response):
-    response.headers['Access-Control-Allow-Origin'] = 'http://127.0.0.1:4000'
+    response.headers['Access-Control-Allow-Origin'] = 'https://simonhansedasi.github.io'
+    # response.headers['Access-Control-Allow-Origin'] = 'https://127.0.0.1:4000'
     response.headers['Access-Control-Allow-Credentials'] = 'true'
     response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
@@ -31,7 +33,15 @@ def ensure_session_id():
     # Ensure the session has an ID
     if 'session_id' not in session:
         session['session_id'] = str(uuid.uuid4())
-    print(f"Session ID: {session['session_id']}")  # Debugging
+    # print(f"Session ID: {session['session_id']}")  # Debugging
+    
+    
+
+    
+    
+@app.route('/')
+def index():
+    return render_template('index.html')
     
     
     
@@ -48,7 +58,20 @@ def get_session_id():
     response = jsonify({'session_id': new_session_id})
     response.set_cookie('session_id', new_session_id, max_age=30*24*60*60, secure=True)
     return response
-        
+
+
+@app.route('/static/<path:filename>')
+def serve_static(filename):
+    return send_from_directory('static', filename)
+
+
+
+
+
+
+
+
+
 @app.route('/score_game', methods=['POST'])
 def score_game():
     data = request.get_json()
