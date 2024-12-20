@@ -383,18 +383,20 @@ def plot_score_data(data,game):
         capprops=dict(color="black", linewidth=1.5),       
         flierprops=dict(marker="o", color="blue", alpha=0.5)  
     )
-    if game == 'Strands':
+    if game == 'strands':
         plt.ylim([-30, 40])
-    if game == 'Connections':
+        game_title = 'Strands'
+    if game == 'connections':
         plt.ylim([-70, 60])
+        game_title = 'Connections'
     plt.xticks(ticks=np.arange(1, len(labels) + 1), labels=labels, fontsize=12)  
     plt.xlabel('Puzzle Number', fontsize=14)
     plt.ylabel('Scores', fontsize=14)
-    plt.title(f'{game} Recent Scores', fontsize=16)
+    plt.title(f'{game_title} Recent Scores', fontsize=16)
     plt.grid(axis='y', linestyle='--', alpha=0.7)
     
     output_path = f'static/images/{game}_recent_scores.png'
-    
+    print(output_path)
     
     plt.savefig(output_path, bbox_inches = 'tight')
     plt.close()

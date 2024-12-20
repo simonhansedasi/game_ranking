@@ -6,7 +6,7 @@ import secrets  # This is used for generating a secret key
 import numpy as np
 import os
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 CORS(app, support_credentials = True, resources={r'/*': {'origins': 'https://simonhansedasi.github.io'}})
 
 # CORS(app, support_credentials = True, resources={r'/*': {'origins': ['https://550fb17db6d8.ngrok.app','https://127.0.0.1:4000','https://simonhansedasi.github.io']}})
@@ -70,7 +70,10 @@ def serve_static(filename):
 
 
 
-
+@app.route('/static/images/<game_type>_recent_scores.png')
+def serve_image(game_type):
+    # This assumes images are saved in the 'static/images' folder
+    return app.send_static_file(f'images/{game_type}_recent_scores.png')
 
 
 
@@ -128,11 +131,7 @@ def score_game():
 @app.route('/get_ranking', methods=['GET'])
 def get_ranking():
     game_type = request.args.get('game_type')
-    print(game_type)
-    if game_type == 'strands':
-        game = 'Strands'
-    if game_type == 'connections':
-        game = 'Connections'
+
     if not game_type:
         return jsonify({'error': 'Game type is required'}), 400
 
@@ -146,7 +145,7 @@ def get_ranking():
         rank = rank.item()
         
         
-    path = f'static/images/{game}_recent_scores.png'  
+    path = f'static/images/{game_type}_recent_scores.png'  
     print(path)
     return jsonify({'rank': rank,"path" : f"/{path}"})
 
