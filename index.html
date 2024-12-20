@@ -56,7 +56,7 @@
     <textarea id="connectionsString" rows="12" cols="15" placeholder="Enter the connections puzzle string here..."></textarea>
     <button onclick="submitScore('connections')">Submit Score</button>
     <br>
-    <img id="connectionsPlotImage" src="" alt="Recent Connections Scores Plot" />
+    <img id="connectionsPlotImage"  alt="Recent Connections Scores Plot" />
 
 
     
@@ -72,7 +72,7 @@
     <textarea id="strandsString" rows="12" cols="15" placeholder="Enter the strands puzzle string here..."></textarea>
     <button onclick="submitScore('strands')">Submit Score</button>
     <br>
-    <img id="strandsPlotImage" src="" alt="Recent Strands Scores Plot" />
+    <img id="strandsPlotImage"  alt="Recent Strands Scores Plot" />
 
     
     
@@ -133,8 +133,9 @@ ensureSessionID();
 function fetchAndDisplayRank(gameType) {
     const rankElementId = gameType === 'connections' ? 'currentConnectionsRank' : 'currentStrandsRank';
     const plotImageElement = gameType === 'connections' ? document.getElementById('connectionsPlotImage') : document.getElementById('strandsPlotImage');
+    const baseURL = window.location.hostname === '127.0.0.1' ? 'https://550fb17db6d8.ngrok.app' : 'https://simonhansedasi.github.io/game_ranking';
 
-    fetch(`https://550fb17db6d8.ngrok.app/get_ranking?game_type=${gameType}`, {
+    fetch(`${baseURL}/get_ranking?game_type=${gameType}`, {
         method: 'GET',
         // mode: 'no-cors',
         credentials: 'include',
@@ -164,7 +165,7 @@ function fetchAndDisplayRank(gameType) {
             }
         
             const capitalizedGameType = gameType.charAt(0).toUpperCase() + gameType.slice(1);
-            plotImageElement.src = `/static/images/${capitalizedGameType}_recent_scores.png`;
+        plotImageElement.src = `${baseURL}/static/images/${gameType.charAt(0).toUpperCase() + gameType.slice(1)}_recent_scores.png`;
         })
         .catch(error => {
             console.error(`Error fetching ${gameType} ranking:`, error);
@@ -174,8 +175,8 @@ function fetchAndDisplayRank(gameType) {
     
 function updateImage() {
     // Assuming the plot is already generated at /static/recent_scores.png
-    const imageStrandsUrl = 'https://550fb17db6d8.ngrok.app/static/images/Strands_recent_scores.png';
-    const imageConnectionsUrl = 'https://550fb17db6d8.ngrok.app/static/images/Connections_recent_scores.png';
+    const imageStrandsUrl = 'https://550fb17db6d8.ngrok.app/static/images/strands_recent_scores.png';
+    const imageConnectionsUrl = 'https://550fb17db6d8.ngrok.app/static/images/connections_recent_scores.png';
 
     // Update the image source dynamically
     document.getElementById('plotStrandsImage').src = imageStrandsUrl;
