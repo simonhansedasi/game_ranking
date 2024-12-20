@@ -122,8 +122,8 @@ function fetchAndDisplayRank(gameType) {
                 document.getElementById(rankElementId).innerHTML = 'Puzzle not yet ranked';
             }
         
-            plotImageElement.src = `/${gameType}_recent_scores.png`;  // Dynamic URL based on the game type
-
+            const capitalizedGameType = gameType.charAt(0).toUpperCase() + gameType.slice(1);
+            plotImageElement.src = `/${capitalizedGameType}_recent_scores.png`;
         })
         .catch(error => {
             console.error(`Error fetching ${gameType} ranking:`, error);
