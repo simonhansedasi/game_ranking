@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Score Dashboard</title>
+    <title>NYT Game Ranker</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -23,7 +23,7 @@
 </head>
 <body>
 
-    <h1>Game Score Dashboard</h1>
+    <h1>NYT Game Ranker</h1>
     
     <h2>Today's Connections Puzzle Scoring</h2>
     <div id="currentConnectionsRank"></div>
@@ -32,7 +32,8 @@
 
     <textarea id="connectionsString" rows="12" cols="15" placeholder="Enter the connections puzzle string here..."></textarea>
     <button onclick="submitScore('connections')">Submit Score</button>
-
+    <br>
+    <img id="plotConnectionsImage" alt="Recent Connections Scores Plot" />
 
 
     
@@ -47,7 +48,8 @@
     <ul id="rankings"></ul>
     <textarea id="strandsString" rows="12" cols="15" placeholder="Enter the strands puzzle string here..."></textarea>
     <button onclick="submitScore('strands')">Submit Score</button>
-    
+    <br>
+    <img id="plotStrandsImage" alt="Recent Strands Scores Plot" />
 
     
     
@@ -57,6 +59,12 @@
     
     
 <script>
+    
+    const imgConnectionsElement = document.getElementById('plotConnectionsImage');
+    imgConnectionsElement.src = '/static/images/Connections_recent_scores.png';
+    
+    const imgStrandsElement = document.getElementById('plotStrandsImage');
+    imgStrandsElement.src = '/static/images/Strands_recent_scores.png';
     // Helper function to set a cookie
 function setCookie(name, value, days) {
     const date = new Date();
