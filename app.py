@@ -109,6 +109,16 @@ def score_game():
     gr.insert_score(game, puzzle_number, score, session_id)
     gr.update_ranking(game, puzzle_number)
     
+    rows, col_names = gr.get_recent_scores()
+    strands, connecs = gr.organize_data(rows)
+    
+    
+    if game == 'connections':
+        gr.plot_score_data(connecs, game = 'Connections')
+
+    if game == 'strands':
+        gr.plot_score_data(strands, game = 'Strands')
+
     rank = gr.get_ranking(game, puzzle_number)
     
     return jsonify({"score": score, "rank" : rank})
