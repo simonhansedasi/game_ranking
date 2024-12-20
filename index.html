@@ -225,7 +225,7 @@ function submitScore(gameType) {
         
         
         const plotImageElement = gameType === 'connections' ? document.getElementById('connectionsPlotImage') : document.getElementById('strandsPlotImage');
-        plotImageElement.src = data.path;  
+        plotImageElement.src = `https://550fb17db6d8.ngrok.app/static/images/${gameType.charAt(0).toUpperCase() + gameType.slice(1)}_recent_scores.png`;  // Use ngrok URL
         
 
         fetchAndDisplayRank(gameType); 
