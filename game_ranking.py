@@ -369,6 +369,7 @@ def plot_score_data(data,game):
         iqrs.append(iqr)
         medians.append(np.median(scores))
     x_positions = np.arange(len(labels))
+    plt.figure(figsize=(6, 4))  # Adjust the size to your desired dimensions
 
     plt.boxplot(
         values, 

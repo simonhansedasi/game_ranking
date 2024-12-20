@@ -4,22 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NYT Game Ranker</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f4f4f4;
-        }
-        input, button {
-            padding: 10px;
-            margin: 10px;
-            font-size: 16px;
-        }
-        .score {
-            font-size: 20px;
-            margin-top: 20px;
-        }
-    </style>
+<style>
+    /* Basic Reset */
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        height: 100vh;  /* Full viewport height */
+        display: flex;
+        flex-direction: column;  /* Stack elements vertically */
+        justify-content: center;  /* Center horizontally */
+        align-items: center;  /* Center vertically */
+        background-color: #f4f4f4;
+    }
+
+    /* Styling for the container */
+    .container {
+        text-align: center;  /* Center text inside */
+        padding: 20px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);  /* Optional: Adds a soft shadow */
+    }
+
+    /* Input and Button Styling */
+    input, button {
+        padding: 10px;
+        margin: 10px;
+        font-size: 16px;
+        width: 200px;  /* Adjust the width if necessary */
+        box-sizing: border-box;
+    }
+
+    /* Styling for the score display */
+    .score {
+        font-size: 20px;
+        margin-top: 20px;
+    }
+</style>
+
 </head>
 <body>
 
@@ -33,7 +56,7 @@
     <textarea id="connectionsString" rows="12" cols="15" placeholder="Enter the connections puzzle string here..."></textarea>
     <button onclick="submitScore('connections')">Submit Score</button>
     <br>
-    <img id="plotConnectionsImage" src="" alt="Recent Connections Scores Plot" />
+    <img id="connectionsPlotImage" src="" alt="Recent Connections Scores Plot" />
 
 
     
@@ -49,7 +72,7 @@
     <textarea id="strandsString" rows="12" cols="15" placeholder="Enter the strands puzzle string here..."></textarea>
     <button onclick="submitScore('strands')">Submit Score</button>
     <br>
-    <img id="plotStrandsImage" src="" alt="Recent Strands Scores Plot" />
+    <img id="strandsPlotImage" src="" alt="Recent Strands Scores Plot" />
 
     
     
@@ -85,6 +108,7 @@ function ensureSessionID() {
         // Fetch a new session ID only if it doesn't exist
         fetch('https://550fb17db6d8.ngrok.app/get_session_id', {
             method: 'GET',
+            // mode: 'no-cors',
             credentials: 'include', // Include cookies for session management
         })
             .then(response => response.json())
@@ -112,10 +136,27 @@ function fetchAndDisplayRank(gameType) {
 
     fetch(`https://550fb17db6d8.ngrok.app/get_ranking?game_type=${gameType}`, {
         method: 'GET',
+        // mode: 'no-cors',
         credentials: 'include',
     })
-        .then(response => response.json())
+    .then(response => {
+    // Log the response body to inspect it
+        console.log('Response:', response);
+
+        // Check if the response is OK (status code 200)
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // Try parsing the JSON
+        return response.json();
+    })
+    
+    
+    
+        // .then(response => response.json())
         .then(data => {
+        
             if (data.rank) {
                 document.getElementById(rankElementId).innerHTML = `Current rank: ${data.rank}`;
             } else {
@@ -123,7 +164,7 @@ function fetchAndDisplayRank(gameType) {
             }
         
             const capitalizedGameType = gameType.charAt(0).toUpperCase() + gameType.slice(1);
-            plotImageElement.src = `/${capitalizedGameType}_recent_scores.png`;
+            plotImageElement.src = `/static/images/${capitalizedGameType}_recent_scores.png`;
         })
         .catch(error => {
             console.error(`Error fetching ${gameType} ranking:`, error);
@@ -131,15 +172,15 @@ function fetchAndDisplayRank(gameType) {
         });
 }
     
-// function updateImage() {
-//     // Assuming the plot is already generated at /static/recent_scores.png
-//     const imageStrandsUrl = 'https://550fb17db6d8.ngrok.app/static/images/Strands_recent_scores.png';
-//     const imageConnectionssUrl = 'https://550fb17db6d8.ngrok.app/static/images/Connections_recent_scores.png';
+function updateImage() {
+    // Assuming the plot is already generated at /static/recent_scores.png
+    const imageStrandsUrl = 'https://550fb17db6d8.ngrok.app/static/images/Strands_recent_scores.png';
+    const imageConnectionsUrl = 'https://550fb17db6d8.ngrok.app/static/images/Connections_recent_scores.png';
 
-//     // Update the image source dynamically
-//     document.getElementById('plotStrandsImage').src = imageStrandsUrl;
-//     document.getElementById('plotConnectionsImage').src = imageConnectionssUrl;
-// }
+    // Update the image source dynamically
+    document.getElementById('plotStrandsImage').src = imageStrandsUrl;
+    document.getElementById('plotConnectionsImage').src = imageConnectionsUrl;
+}
     
     
     
@@ -186,7 +227,7 @@ function submitScore(gameType) {
         const plotImageElement = gameType === 'connections' ? document.getElementById('connectionsPlotImage') : document.getElementById('strandsPlotImage');
         plotImageElement.src = data.path;  
         
-        
+
         fetchAndDisplayRank(gameType); 
         })
         .catch(error => {

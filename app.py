@@ -9,7 +9,8 @@ import os
 app = Flask(__name__)
 CORS(app, support_credentials = True, resources={r'/*': {'origins': 'https://simonhansedasi.github.io'}})
 
-# CORS(app, support_credentials = True, resources={r'/*': {'origins': 'https://127.0.0.1:4000'}})
+# CORS(app, support_credentials = True, resources={r'/*': {'origins': ['https://550fb17db6d8.ngrok.app','https://127.0.0.1:4000','https://simonhansedasi.github.io']}})
+# CORS(app, support_credentials=True, resources={r'/*': {'origins': 'http://127.0.0.1:4000'}})
 
 app.config['PREFERRED_URL_SCHEME'] = 'https'
 
@@ -22,7 +23,7 @@ app.permanent_session_lifetime = 60 * 60 * 24 * 30  # 30 days
 @app.after_request
 def add_cors_headers(response):
     response.headers['Access-Control-Allow-Origin'] = 'https://simonhansedasi.github.io'
-    # response.headers['Access-Control-Allow-Origin'] = 'https://127.0.0.1:4000'
+    # response.headers['Access-Control-Allow-Origin'] = 'http://127.0.0.1:4000'
     response.headers['Access-Control-Allow-Credentials'] = 'true'
     response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
@@ -127,7 +128,11 @@ def score_game():
 @app.route('/get_ranking', methods=['GET'])
 def get_ranking():
     game_type = request.args.get('game_type')
-    
+    print(game_type)
+    if game_type == 'strands':
+        game = 'Strands'
+    if game_type == 'connections':
+        game = 'Connections'
     if not game_type:
         return jsonify({'error': 'Game type is required'}), 400
 
@@ -139,7 +144,11 @@ def get_ranking():
     # Convert NumPy int64 to Python int
     if isinstance(rank, (np.integer, np.floating)):
         rank = rank.item()
-    return jsonify({'rank': rank})
+        
+        
+    path = f'static/images/{game}_recent_scores.png'  
+    print(path)
+    return jsonify({'rank': rank,"path" : f"/{path}"})
 
 
 if __name__ == '__main__':
