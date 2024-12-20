@@ -4,6 +4,7 @@ import uuid
 import game_ranking as gr
 import secrets  # This is used for generating a secret key
 import numpy as np
+import os
 
 app = Flask(__name__)
 CORS(app, support_credentials = True, resources={r'/*': {'origins': 'https://simonhansedasi.github.io'}})
@@ -114,14 +115,14 @@ def score_game():
     
     
     if game == 'connections':
-        gr.plot_score_data(connecs, game = 'Connections')
+        path = gr.plot_score_data(connecs, game = 'Connections')
 
     if game == 'strands':
-        gr.plot_score_data(strands, game = 'Strands')
+        path = gr.plot_score_data(strands, game = 'Strands')
 
     rank = gr.get_ranking(game, puzzle_number)
     
-    return jsonify({"score": score, "rank" : rank})
+    return jsonify({"score": score, "rank" : rank, "path" : f'/{path}'})
 
 @app.route('/get_ranking', methods=['GET'])
 def get_ranking():

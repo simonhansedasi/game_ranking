@@ -397,4 +397,4 @@ def plot_score_data(data,game):
     
     plt.savefig(output_path, bbox_inches = 'tight')
     plt.close()
-    return 
+    return output_path
