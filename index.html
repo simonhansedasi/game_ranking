@@ -33,7 +33,7 @@
     <textarea id="connectionsString" rows="12" cols="15" placeholder="Enter the connections puzzle string here..."></textarea>
     <button onclick="submitScore('connections')">Submit Score</button>
     <br>
-    <img id="plotConnectionsImage" src="https://550fb17db6d8.ngrok.app/static/images/Connections_recent_scores.png" alt="Recent Connections Scores Plot" />
+    <img id="plotConnectionsImage" src="" alt="Recent Connections Scores Plot" />
 
 
     
@@ -49,7 +49,7 @@
     <textarea id="strandsString" rows="12" cols="15" placeholder="Enter the strands puzzle string here..."></textarea>
     <button onclick="submitScore('strands')">Submit Score</button>
     <br>
-    <img id="plotStrandsImage" src="https://550fb17db6d8.ngrok.app/static/images/Strands_recent_scores.png" alt="Recent Strands Scores Plot" />
+    <img id="plotStrandsImage" src="" alt="Recent Strands Scores Plot" />
 
     
     
@@ -60,11 +60,6 @@
     
 <script>
     
-    const imgConnectionsElement = document.getElementById('plotConnectionsImage');
-    imgConnectionsElement.src = '/static/images/Connections_recent_scores.png';
-    
-    const imgStrandsElement = document.getElementById('plotStrandsImage');
-    imgStrandsElement.src = '/static/images/Strands_recent_scores.png';
     // Helper function to set a cookie
 function setCookie(name, value, days) {
     const date = new Date();
@@ -108,7 +103,7 @@ ensureSessionID();
 
     
     
-    
+
     
 // Function to fetch and display the current ranking
 function fetchAndDisplayRank(gameType) {
@@ -131,6 +126,21 @@ function fetchAndDisplayRank(gameType) {
             document.getElementById(rankElementId).innerHTML = 'Error fetching ranking.';
         });
 }
+    
+function updateImage() {
+    // Assuming the plot is already generated at /static/recent_scores.png
+    const imageStrandsUrl = 'https://550fb17db6d8.ngrok.app/static/images/Strands_recent_scores.png';
+    const imageConnectionssUrl = 'https://550fb17db6d8.ngrok.app/static/images/Connections_recent_scores.png';
+
+    // Update the image source dynamically
+    document.getElementById('plotStrandsImage').src = imageStrandsUrl;
+    document.getElementById('plotConnectionsImage').src = imageConnectionssUrl;
+}
+    
+    
+    
+    
+    
 // Function to submit the score
 function submitScore(gameType) {
     let puzzleString = '';
@@ -173,14 +183,20 @@ function submitScore(gameType) {
         .catch(error => {
             document.getElementById(scoreElementId).textContent = `Error: ${error.message}`;
             console.error('Error:', error);
-        });
+        })
+    
+    updateImage();
+    
 }
     window.onload = function () {
     fetchAndDisplayRank('connections');
     fetchAndDisplayRank('strands');
+    updateImage;
 };
 
 </script>
+    
+
 
 </body>
 </html>
