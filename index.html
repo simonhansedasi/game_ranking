@@ -10,7 +10,7 @@
         font-family: Arial, sans-serif;
         margin: 0;
         padding: 0;
-        height: 100vh;  /* Full viewport height */
+        min-height: 100vh;  /* Ensure content can grow beyond the viewport */
         display: flex;
         flex-direction: column;  /* Stack elements vertically */
         justify-content: center;  /* Center horizontally */
@@ -27,7 +27,10 @@
         box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);  /* Optional: Adds a soft shadow */
     }
 
-
+    .plot-container {
+        max-width: 600px; /* Optional: Limit the container's width on larger screens */
+        margin: 0 auto;  /* Center the container */
+    }
 
     /* Styling for the score display */
     .score {
@@ -52,13 +55,14 @@
 
     <textarea id="connectionsString" rows="12" cols="15" placeholder="Enter the connections puzzle string here..."></textarea>
     <button onclick="submitScore('connections')">Submit Score</button>
-    <br>
+<div class="plot-container">
     <img id="connectionsPlotImage" src="" alt="Recent Connections Scores Plot" />
+    </div>
 
-
     
     
-    
+    <p>
+    <p>
     
     <h2>Today's Strands Puzzle Scoring</h2>
     <div id="currentStrandsRank"></div>
@@ -69,8 +73,9 @@
     <textarea id="strandsString" rows="12" cols="15" placeholder="Enter the strands puzzle string here..."></textarea>
     <button onclick="submitScore('strands')">Submit Score</button>
     <br>
+    <div class="plot-container">
     <img id="strandsPlotImage" src="" alt="Recent Strands Scores Plot" />
-
+    </div>
     
     
     
