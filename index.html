@@ -137,7 +137,7 @@ function fetchAndDisplayRank(gameType) {
         ? 'https://550fb17db6d8.ngrok.app' // ngrok URL for local dev
         : 'https://127.0.0.1:4000';
 
-    fetch(`${baseURL}/get_ranking?game_type=${gameType}`, {
+    fetch(`https://550fb17db6d8.ngrok.app/get_ranking?game_type=${gameType}`, {
         method: 'GET',
         // mode: 'no-cors',
         credentials: 'include',
