@@ -180,8 +180,9 @@ function fetchAndDisplayRank(gameType) {
             }
 
             // Update the plot image
-            plotImageElement.src = `https://550fb17db6d8.ngrok.app/static/images/${gameType}_recent_scores.png`;
-        })
+        const timestamp = new Date().getTime();
+
+        plotImageElement.src = `https://550fb17db6d8.ngrok.app/static/images/${gameType}_recent_scores.png?t=${timestamp}`;        })
         .catch(error => {
             console.error(`Error fetching ${gameType} ranking:`, error);
             document.getElementById(rankElementId).innerHTML = 'Error fetching ranking.';
