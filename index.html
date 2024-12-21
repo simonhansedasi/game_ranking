@@ -244,7 +244,9 @@ function submitScore(gameType) {
 //             : document.getElementById('strandsPlotImage');
         
 //         const plotImageElement = gameType === 'connections' ? document.getElementById('connectionsPlotImage') : document.getElementById('strandsPlotImage');
-//         plotImageElement.src = `https://550fb17db6d8.ngrok.app/static/images/${gameType}_recent_scores.png`;  // Use ngrok URL
+        const timestamp = new Date().getTime();
+
+        plotImageElement.src = `https://550fb17db6d8.ngrok.app/static/images/${gameType}_recent_scores.png`;  // Use ngrok URL
         
 
         fetchAndDisplayRank(gameType); 
