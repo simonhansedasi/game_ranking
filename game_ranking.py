@@ -362,8 +362,14 @@ def drop_old_scores(data):
 
 def plot_score_data(data,game):
 
-
+    data = dict(sorted(data.items()))
+    
+    
+    data = drop_old_scores(data)
+    
+    
     labels = list(data.keys())[::-1]
+
     values = [data[key] for key in labels]
     iqrs = []
     medians = []
@@ -394,11 +400,13 @@ def plot_score_data(data,game):
         capprops=dict(color="black", linewidth=1.5),       
         flierprops=dict(marker="o", color="blue", alpha=0.5)  
     )
-    if game == 'Strands':
+    if game == 'strands':
         game_title = 'Strands'
-    if game == 'Connections':
+    if game == 'connections':
         game_title = 'Connections'
-    flattened_values = np.concatenate(values)
+        
+    print(values)
+    flattened_values = sorted(np.concatenate([np.atleast_1d(v if isinstance(v, list) else [v]) for v in values if v]))
 
     plt.ylim([np.min(flattened_values) - 10, np.max(flattened_values) + 10])
     plt.xticks(ticks=np.arange(1, len(labels) + 1), labels=labels, fontsize=12)  
