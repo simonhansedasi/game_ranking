@@ -33,7 +33,9 @@ def clean_puzzle_input(puzzle_string):
         
     if game == 'connections':
         puzzle_number = lines[1].split("#")[1].strip()
-    
+    # elif game != 'Strands' or 'Connections':
+    #     puzzle_number = None
+    print(puzzle_number)
     puzzle_lines = lines[2:]
 
     clean_puzzle_string = "\n".join(puzzle_lines)
@@ -54,9 +56,9 @@ def score_connections_puzzle(connections_string):
 
 
 strands_score_map = {
-    '🟡' : 20,
-    '🔵' : 1,
-    '💡' : -3
+    '🟡' : 10,
+    '🔵' : 5,
+    '💡' : -5
 }
 
 
@@ -282,17 +284,17 @@ def get_current_rank(game_type):
 
     # Check if a puzzle date exists for the game type
     cursor.execute("""
-        SELECT r.ranking
+        SELECT r.ranking, r.puzzle_number
         FROM rankings r
         JOIN puzzle_dates pd ON r.game_type = pd.game_type AND r.puzzle_number = pd.puzzle_number
         WHERE r.game_type = ?
-        ORDER BY r.timestamp DESC LIMIT 1
+        ORDER BY r.puzzle_number DESC LIMIT 5
     """, (game_type,))
 
-    row = cursor.fetchone()
+    row = cursor.fetchall()
     conn.close()
 
-    return row[0] if row else 0
+    return row if row else 0
 
 
 
@@ -305,7 +307,7 @@ def get_recent_scores(puzzle_number = None, db_file = 'rankings.db'):
         SELECT DISTINCT puzzle_number
         FROM puzzles
         ORDER BY timestamp DESC
-        LIMIT 5
+        
     )
     SELECT p.game_type, p.puzzle_number, p.score
     FROM puzzles p
@@ -349,6 +351,15 @@ def organize_data(rows):
     return strands, connecs
 
 
+
+def drop_old_scores(data):
+
+    max_key = max(data.keys())
+    keys_to_keep = [key for key in data.keys() if key >= max_key - 5]
+    data = {key: data[key] for key in keys_to_keep}
+    
+    return data
+
 def plot_score_data(data,game):
 
 
@@ -369,7 +380,7 @@ def plot_score_data(data,game):
         iqrs.append(iqr)
         medians.append(np.median(scores))
     x_positions = np.arange(len(labels))
-    plt.figure(figsize=(6, 4))  # Adjust the size to your desired dimensions
+    plt.figure(figsize=(5, 3))  # Adjust the size to your desired dimensions
 
     plt.boxplot(
         values, 
@@ -383,18 +394,20 @@ def plot_score_data(data,game):
         capprops=dict(color="black", linewidth=1.5),       
         flierprops=dict(marker="o", color="blue", alpha=0.5)  
     )
-    if game == 'strands':
-        plt.ylim([-30, 40])
+    if game == 'Strands':
         game_title = 'Strands'
-    if game == 'connections':
-        plt.ylim([-70, 60])
+    if game == 'Connections':
         game_title = 'Connections'
+    flattened_values = np.concatenate(values)
+
+    plt.ylim([np.min(flattened_values) - 10, np.max(flattened_values) + 10])
     plt.xticks(ticks=np.arange(1, len(labels) + 1), labels=labels, fontsize=12)  
     plt.xlabel('Puzzle Number', fontsize=14)
     plt.ylabel('Scores', fontsize=14)
     plt.title(f'{game_title} Recent Scores', fontsize=16)
     plt.grid(axis='y', linestyle='--', alpha=0.7)
-    
+    plt.gca().invert_xaxis()
+
     output_path = f'static/images/{game}_recent_scores.png'
     print(output_path)
     
