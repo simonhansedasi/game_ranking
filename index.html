@@ -213,11 +213,14 @@ function submitScore(gameType) {
         puzzleString = document.getElementById("connectionsString").value;
         scoreElementId = "connectionsScore";
         rankElementId = "currentConnectionsRank";
+        plotImageElement = document.getElementById('connectionsPlotImage');
 
     } else if (gameType === 'strands') {
         puzzleString = document.getElementById("strandsString").value;
         scoreElementId = "strandsScore";
         rankElementId = "currentStrandsRank";
+        plotImageElement = document.getElementById('strandsPlotImage');
+
 
     }
 
