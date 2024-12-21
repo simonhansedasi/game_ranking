@@ -108,35 +108,35 @@ def score_game():
 #         print(current_puzzle_number)
 #         print('wrong day')
 #         return jsonify({'score': 'puzzle does not match current day'}), 400
-    
-    if game == 'connections':
-        score = gr.score_connections_puzzle(clean_string)
-    if game == 'strands':
-        score = gr.score_strands_puzzle(clean_string)
-        
-    utc_timestamp = datetime.utcnow()  # Current UTC time
+    else:
+        if game == 'connections':
+            score = gr.score_connections_puzzle(clean_string)
+        if game == 'strands':
+            score = gr.score_strands_puzzle(clean_string)
 
-    gr.insert_score(game, puzzle_number, score, session_id)
-    gr.update_ranking(game, puzzle_number)
-    
-    rows, col_names = gr.get_recent_scores()
-    strands, connecs = gr.organize_data(rows)
-    
-    print(game)
-    if game == 'connections':
-        connecs = gr.drop_old_scores(connecs)
-        path = gr.plot_score_data(connecs, game = 'Connections')
+        utc_timestamp = datetime.utcnow()  # Current UTC time
 
-    if game == 'strands':
-        path = gr.plot_score_data(strands, game = 'Strands')
-        
-    # else:
-    #     print('Invalid game type')
-    #     return jsonify({'score': 'Invalid game type'}), 400
+        gr.insert_score(game, puzzle_number, score, session_id)
+        gr.update_ranking(game, puzzle_number)
 
-    rank = gr.get_ranking(game, puzzle_number)
-    
-    return jsonify({"score": score, "rank" : rank, "path" : f'/{path}'})
+        rows, col_names = gr.get_recent_scores()
+        strands, connecs = gr.organize_data(rows)
+
+        print(game)
+        if game == 'connections':
+            connecs = gr.drop_old_scores(connecs)
+            path = gr.plot_score_data(connecs, game = 'connections')
+
+        if game == 'strands':
+            path = gr.plot_score_data(strands, game = 'strands')
+
+        # else:
+        #     print('Invalid game type')
+        #     return jsonify({'score': 'Invalid game type'}), 400
+
+        rank = gr.get_ranking(game, puzzle_number)
+
+        return jsonify({"score": score, "rank" : rank, "path" : f'/{path}'})
 
 @app.route('/get_ranking', methods=['GET'])
 def get_ranking():
@@ -159,10 +159,16 @@ def get_ranking():
     if isinstance(rank, (np.integer, np.floating)):
         rank = rank.item()
         
-        
-    print(rank[0][0], 'poopnoblers')
-    path = f'static/images/{game_type}_recent_scores.png'  
-    print(path)
+    rows, col_names = gr.get_recent_scores()
+    strands, connecs = gr.organize_data(rows)
+    if game_type == 'connections':
+        connecs = gr.drop_old_scores(connecs)
+        path = gr.plot_score_data(connecs, game = 'connections')
+
+    if game_type == 'strands':
+        strands = gr.drop_old_scores(strands)
+
+        path = gr.plot_score_data(strands, game = 'strands')
     return jsonify(
         {
             'puzz1': str(np.round(rank[0][1],3)),

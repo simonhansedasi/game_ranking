@@ -355,7 +355,7 @@ def organize_data(rows):
 def drop_old_scores(data):
 
     max_key = max(data.keys())
-    keys_to_keep = [key for key in data.keys() if key >= max_key - 5]
+    keys_to_keep = [key for key in data.keys() if key >= max_key - 4]
     data = {key: data[key] for key in keys_to_keep}
     
     return data
