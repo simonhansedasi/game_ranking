@@ -207,6 +207,7 @@ function submitScore(gameType) {
     let puzzleString = '';
     let scoreElementId = '';
     let rankElementId = '';
+    let plotImageElement; // Declare plotImageElement only once
 
     if (gameType === 'connections') {
         puzzleString = document.getElementById("connectionsString").value;
@@ -238,12 +239,12 @@ function submitScore(gameType) {
         .then(response => response.json())
         .then(data => {
             document.getElementById(scoreElementId).innerHTML = `Your score: ${data.score}`;
-        const plotImageElement = gameType === 'connections' 
-            ? document.getElementById('connectionsPlotImage') 
-            : document.getElementById('strandsPlotImage');
+//         const plotImageElement = gameType === 'connections' 
+//             ? document.getElementById('connectionsPlotImage') 
+//             : document.getElementById('strandsPlotImage');
         
-        const plotImageElement = gameType === 'connections' ? document.getElementById('connectionsPlotImage') : document.getElementById('strandsPlotImage');
-        plotImageElement.src = `https://550fb17db6d8.ngrok.app/static/images/${gameType}_recent_scores.png`;  // Use ngrok URL
+//         const plotImageElement = gameType === 'connections' ? document.getElementById('connectionsPlotImage') : document.getElementById('strandsPlotImage');
+//         plotImageElement.src = `https://550fb17db6d8.ngrok.app/static/images/${gameType}_recent_scores.png`;  // Use ngrok URL
         
 
         fetchAndDisplayRank(gameType); 
