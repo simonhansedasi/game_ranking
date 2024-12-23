@@ -10,10 +10,10 @@ from datetime import datetime, timezone
 # Function to get current UTC date and time
 utc_now = lambda: datetime.now(timezone.utc)
 app = Flask(__name__, static_folder='static')
-# CORS(app, support_credentials = True, resources={r'/*': {'origins': 'https://simonhansedasi.github.io'}})
+CORS(app, support_credentials = True, resources={r'/*': {'origins': 'https://simonhansedasi.github.io'}})
 
 # CORS(app, support_credentials = True, resources={r'/*': {'origins': ['https://550fb17db6d8.ngrok.app','https://127.0.0.1:4000','https://simonhansedasi.github.io']}})
-CORS(app, support_credentials=True, resources={r'/*': {'origins': ['http://127.0.0.1:4000', 'https://52da574b92c9.ngrok.app']}})
+# CORS(app, support_credentials=True, resources={r'/*': {'origins': ['http://127.0.0.1:4000', 'https://52da574b92c9.ngrok.app']}})
 
 # app.config['PREFERRED_URL_SCHEME'] = 'https'
 
@@ -25,8 +25,8 @@ app.permanent_session_lifetime = 60 * 60 * 24 * 30  # 30 days
 
 @app.after_request
 def add_cors_headers(response):
-    # response.headers['Access-Control-Allow-Origin'] = 'https://simonhansedasi.github.io'
-    response.headers['Access-Control-Allow-Origin'] = 'http://127.0.0.1:4000'
+    response.headers['Access-Control-Allow-Origin'] = 'https://simonhansedasi.github.io'
+    # response.headers['Access-Control-Allow-Origin'] = 'http://127.0.0.1:4000'
     response.headers['Access-Control-Allow-Credentials'] = 'true'
     response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
@@ -93,7 +93,7 @@ def score_game():
     game, puzzle_number, clean_string = gr.clean_puzzle_input(game_string)
     print(game)
     print('data cleaned')
-    if gr.score_exists(session_id, puzzle_number):
+    if gr.score_exists(session_id, puzzle_number, game_type):
         print('no can do siree')
         return jsonify({'score': 'Score for this player and puzzle already submitted'}), 400
     
@@ -122,13 +122,13 @@ def score_game():
         rows, col_names = gr.get_recent_scores()
         strands, connecs = gr.organize_data(rows)
 
-        print(game)
+        # print(game)
         if game == 'connections':
             connecs = gr.drop_old_scores(connecs)
-            path = gr.plot_score_data(connecs, game = 'connections')
+            path = gr.plot_score_data(connecs, game = 'connections', session_id = session_id)
 
         if game == 'strands':
-            path = gr.plot_score_data(strands, game = 'strands')
+            path = gr.plot_score_data(strands, game = 'strands', session_id = session_id)
 
         # else:
         #     print('Invalid game type')
@@ -141,35 +141,37 @@ def score_game():
 @app.route('/get_ranking', methods=['GET'])
 def get_ranking():
     game_type = request.args.get('game_type')
-
+    session_id = request.args.get('session_id')
     if not game_type:
         return jsonify({'error': 'Game type is required'}), 400
 
     # Query the database to get the current ranking for the game type
     
     row = gr.get_current_rank(game_type)
-    print(row)
+    # print(row)
     
     
     rank = np.round(gr.get_current_rank(game_type),2)  # Implement this function to fetch the ranking
-    print(rank, 'hhhhooo')
+    # print(rank, 'hhhhooo')
     if rank is None:
         return jsonify({'error': 'No ranking data available'}), 404
     # Convert NumPy int64 to Python int
     if isinstance(rank, (np.integer, np.floating)):
         rank = rank.item()
-        
+    print(session_id)
     rows, col_names = gr.get_recent_scores()
     strands, connecs = gr.organize_data(rows)
     if game_type == 'connections':
         connecs = gr.drop_old_scores(connecs)
-        path = gr.plot_score_data(connecs, game = 'connections')
+        path = gr.plot_score_data(connecs, game = 'connections',session_id = session_id)
 
     if game_type == 'strands':
         strands = gr.drop_old_scores(strands)
 
-        path = gr.plot_score_data(strands, game = 'strands')
-    print(rank)
+        path = gr.plot_score_data(strands, game = 'strands',session_id = session_id)
+        
+    print(path)
+    # print(rank)
     return jsonify(
         {
             'puzz1': str(np.round(rank[0][1],3)),
@@ -183,7 +185,7 @@ def get_ranking():
             
             'puzz5': str(rank[4][1]),
             'rank5': str(rank[4][0]),
-            "path" : f"/{path}"
+            # "path" : f"/{path}"
         }
     )
 

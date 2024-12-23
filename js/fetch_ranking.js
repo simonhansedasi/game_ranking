@@ -20,11 +20,17 @@
         const plotImageElement = gameType === 'connections'
             ? document.getElementById('connectionsPlotImage') 
             : document.getElementById('strandsPlotImage');
+        const session_id = getCookie('session_id'); // Retrieve session ID
+        const requestBody = {
+        game_type: gameType,
+        session_id: session_id, // Include session ID in the request body
+    };
+
         // const baseURL = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost'
             // ? `${apiBaseUrl}` // ngrok URL for local dev
             // : 'https://127.0.0.1:4000';
 
-        fetch(`${baseURL}/get_ranking?game_type=${gameType}`, {
+        fetch(`${baseURL}/get_ranking?game_type=${gameType}&session_id=${session_id}`, {
             method: 'GET',
             credentials: 'include',
         })
