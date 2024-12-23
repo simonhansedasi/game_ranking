@@ -3,6 +3,8 @@ import uuid
 from datetime import date, timedelta
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')  # Use non-GUI backend
 import os
 
 
@@ -213,17 +215,39 @@ def insert_score(game_type, puzzle_number, score, session_id):
     
     
     
-def score_exists(session_id, puzzle_number ):
+def score_exists(session_id, puzzle_number, game_type ):
     conn = sqlite3.connect('rankings.db')
     c = conn.cursor()
     
     # Query to check if a score for this player and puzzle already exists
-    c.execute('SELECT COUNT(*) FROM puzzles WHERE session_id = ? AND puzzle_number = ?', (session_id, puzzle_number))
+    c.execute('''
+        SELECT COUNT(*) FROM puzzles 
+        WHERE session_id = ? AND puzzle_number = ? AND game_type = ?
+        ''', (session_id, puzzle_number, game_type))
     count = c.fetchone()[0]
     
     conn.close()
     
     return count > 0
+
+
+
+def get_session_scores(session_id, game_type ):
+    conn = sqlite3.connect('rankings.db')
+    c = conn.cursor()
+    
+    # Query to check if a score for this player and puzzle already exists
+    c.execute('''
+        SELECT puzzle_number, score 
+        FROM puzzles WHERE session_id = ? AND game_type = ?
+        ORDER BY puzzle_number DESC LIMIT 5
+
+    ''', (session_id, game_type))
+    scores = c.fetchall()
+    
+    conn.close()
+    
+    return scores
 
 
 
@@ -267,15 +291,6 @@ def get_ranking(game_type, puzzle_number):
     return rank
 
 
-
-# def get_current_rank(game_type):
-#     conn = sqlite3.connect('rankings.db')
-#     cursor = conn.cursor()
-#     cursor.execute("SELECT ranking FROM rankings WHERE game_type = ? ORDER BY timestamp DESC LIMIT 1", (game_type,))
-#     row = cursor.fetchone()
-#     conn.close()
-
-#     return row[0] if row else 0.0
 
 
 def get_current_rank(game_type):
@@ -366,8 +381,13 @@ def drop_old_scores(data):
     
     return data
 
-def plot_score_data(data,game):
-    print(data)
+def plot_score_data(data,game,session_id):
+    # print(data)
+    # print(game)
+    
+    session_scores = get_session_scores(session_id, game )
+    # print(session_scores)
+    
     
     if data == None:
         return
@@ -375,15 +395,32 @@ def plot_score_data(data,game):
     
     
     data = drop_old_scores(data)
+    # print(data)
     
+    sesh_scores = {}
     
+    for key, item in session_scores:
+        sesh_scores[key] = item 
+    sesh_scores = dict(sorted(sesh_scores.items()))
+    # print(sesh_scores)
     labels = list(data.keys())[::-1]
 
     values = [data[key] for key in labels]
+    sesh_labels = list(sesh_scores.keys())[::-1] 
+    print(sesh_labels)
+    # for i in range(len(sesh_labels)):
+    #     sesh_labels[i] -= 1
+    # print(sesh_labels)
+    sesh_score = [sesh_scores[key] for key in sesh_scores.keys()]
+    # print(sesh_score)
+    
+    
     iqrs = []
     medians = []
     q1s = []
     q2s = []
+    # print(medians)
+    # print(values)
     for scores in values:
 
         q1 = np.percentile(scores, 75)
@@ -393,10 +430,15 @@ def plot_score_data(data,game):
         q1s.append(q1)
         q2s.append(q2)
         iqrs.append(iqr)
-        medians.append(np.median(scores))
+        # medians.append(np.median(scores))
+    # print('poopsiepoop')   
+    # plt.scatter(sesh_score, 'x')
+    # print('scores scattered')
     x_positions = np.arange(len(labels))
+    sesh_x_positions = np.arange(len(sesh_labels))
     plt.figure(figsize=(5, 3))  # Adjust the size to your desired dimensions
 
+    # print(values)
     plt.boxplot(
         values, 
         patch_artist=True,               
@@ -409,14 +451,20 @@ def plot_score_data(data,game):
         capprops=dict(color="black", linewidth=1.5),       
         flierprops=dict(marker="o", color="blue", alpha=0.5)  
     )
+    # print('fdsafdsafdsa')
     if game == 'strands':
         game_title = 'Strands'
+        # print('whoop')
     if game == 'connections':
         game_title = 'Connections'
-        
-    print(values)
+        # print('whoopy ')
+    # print(scores)
+    # print('poopwop')
     flattened_values = sorted(np.concatenate([np.atleast_1d(v if isinstance(v, list) else [v]) for v in values if v]))
-
+    # if sesh_scores:
+        # print('weeee!!!')
+        # plt.scatter(sesh_score, 'x')
+    plt.scatter(sesh_x_positions + 1, sesh_score)
     plt.ylim([np.min(flattened_values) - 10, np.max(flattened_values) + 10])
     plt.xticks(ticks=np.arange(1, len(labels) + 1), labels=labels, fontsize=12)  
     plt.xlabel('Puzzle Number', fontsize=14)
@@ -426,7 +474,7 @@ def plot_score_data(data,game):
     plt.gca().invert_xaxis()
 
     output_path = f'static/images/{game}_recent_scores.png'
-    print(output_path)
+    # print(output_path)
     
     plt.savefig(output_path, bbox_inches = 'tight')
     plt.close()
