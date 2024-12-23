@@ -10,12 +10,12 @@ from datetime import datetime, timezone
 # Function to get current UTC date and time
 utc_now = lambda: datetime.now(timezone.utc)
 app = Flask(__name__, static_folder='static')
-CORS(app, support_credentials = True, resources={r'/*': {'origins': 'https://simonhansedasi.github.io'}})
+# CORS(app, support_credentials = True, resources={r'/*': {'origins': 'https://simonhansedasi.github.io'}})
 
 # CORS(app, support_credentials = True, resources={r'/*': {'origins': ['https://550fb17db6d8.ngrok.app','https://127.0.0.1:4000','https://simonhansedasi.github.io']}})
-# CORS(app, support_credentials=True, resources={r'/*': {'origins': 'http://127.0.0.1:4000'}})
+CORS(app, support_credentials=True, resources={r'/*': {'origins': ['http://127.0.0.1:4000', 'https://52da574b92c9.ngrok.app']}})
 
-app.config['PREFERRED_URL_SCHEME'] = 'https'
+# app.config['PREFERRED_URL_SCHEME'] = 'https'
 
 secret_key = secrets.token_hex(16)
 
@@ -25,8 +25,8 @@ app.permanent_session_lifetime = 60 * 60 * 24 * 30  # 30 days
 
 @app.after_request
 def add_cors_headers(response):
-    response.headers['Access-Control-Allow-Origin'] = 'https://simonhansedasi.github.io'
-    # response.headers['Access-Control-Allow-Origin'] = 'http://127.0.0.1:4000'
+    # response.headers['Access-Control-Allow-Origin'] = 'https://simonhansedasi.github.io'
+    response.headers['Access-Control-Allow-Origin'] = 'http://127.0.0.1:4000'
     response.headers['Access-Control-Allow-Credentials'] = 'true'
     response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
@@ -169,6 +169,7 @@ def get_ranking():
         strands = gr.drop_old_scores(strands)
 
         path = gr.plot_score_data(strands, game = 'strands')
+    print(rank)
     return jsonify(
         {
             'puzz1': str(np.round(rank[0][1],3)),

@@ -293,9 +293,14 @@ def get_current_rank(game_type):
 
     row = cursor.fetchall()
     conn.close()
+    
+    
+    
+    
+    while len(row) < 5:
+        row.append((0, 0))
 
-    return row if row else 0
-
+    return row
 
 
 def get_recent_scores(puzzle_number = None, db_file = 'rankings.db'):
@@ -353,7 +358,8 @@ def organize_data(rows):
 
 
 def drop_old_scores(data):
-
+    if data == {}:
+        return
     max_key = max(data.keys())
     keys_to_keep = [key for key in data.keys() if key >= max_key - 4]
     data = {key: data[key] for key in keys_to_keep}
@@ -361,7 +367,10 @@ def drop_old_scores(data):
     return data
 
 def plot_score_data(data,game):
-
+    print(data)
+    
+    if data == None:
+        return
     data = dict(sorted(data.items()))
     
     
