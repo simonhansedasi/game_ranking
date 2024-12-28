@@ -464,7 +464,7 @@ def plot_score_data(data,game,session_id):
     # if sesh_scores:
         # print('weeee!!!')
         # plt.scatter(sesh_score, 'x')
-    plt.scatter(sesh_x_positions + 1, sesh_score)
+    plt.scatter(sesh_x_positions[::-1] + 1, sesh_score)
     plt.ylim([np.min(flattened_values) - 10, np.max(flattened_values) + 10])
     plt.xticks(ticks=np.arange(1, len(labels) + 1), labels=labels, fontsize=12)  
     plt.xlabel('Puzzle Number', fontsize=14)

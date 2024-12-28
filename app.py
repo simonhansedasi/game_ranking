@@ -10,10 +10,10 @@ from datetime import datetime, timezone
 # Function to get current UTC date and time
 utc_now = lambda: datetime.now(timezone.utc)
 app = Flask(__name__, static_folder='static')
-CORS(app, support_credentials = True, resources={r'/*': {'origins': 'https://simonhansedasi.github.io'}})
+# CORS(app, support_credentials = True, resources={r'/*': {'origins': 'https://simonhansedasi.github.io'}})
 
-# CORS(app, support_credentials = True, resources={r'/*': {'origins': ['https://550fb17db6d8.ngrok.app','https://127.0.0.1:4000','https://simonhansedasi.github.io']}})
-# CORS(app, support_credentials=True, resources={r'/*': {'origins': ['http://127.0.0.1:4000', 'https://52da574b92c9.ngrok.app']}})
+CORS(app, support_credentials = True, resources={r'/*': {'origins': ['https://550fb17db6d8.ngrok.app','https://127.0.0.1:4000','https://simonhansedasi.github.io']}})
+# CORS(app, support_credentials=True, resources={r'/*': {'origins': ['http://127.0.0.1:4000']}})
 
 # app.config['PREFERRED_URL_SCHEME'] = 'https'
 
@@ -93,7 +93,8 @@ def score_game():
     game, puzzle_number, clean_string = gr.clean_puzzle_input(game_string)
     print(game)
     print('data cleaned')
-    if gr.score_exists(session_id, puzzle_number, game_type):
+    print(game)
+    if gr.score_exists(session_id, puzzle_number, game):
         print('no can do siree')
         return jsonify({'score': 'Score for this player and puzzle already submitted'}), 400
     
