@@ -47,10 +47,11 @@ def clean_puzzle_input(puzzle_string):
 def score_connections_puzzle(connections_string):
     score = 0
     rows = connections_string.strip().split("\n")
-    
+    ticker = 4
     for row in rows:
         if all(emoji == row[0] for emoji in row):
-            score += sum(connections_score_map[emoji] for emoji in row)
+            score += (sum(connections_score_map[emoji] for emoji in row) * ticker)
+            ticker -= 1
         else:
             score -= sum(connections_score_map[emoji] for emoji in row)
     return score
@@ -464,7 +465,7 @@ def plot_score_data(data,game,session_id):
     # if sesh_scores:
         # print('weeee!!!')
         # plt.scatter(sesh_score, 'x')
-    plt.scatter(sesh_x_positions[::-1] + 1, sesh_score)
+    plt.scatter(sesh_x_positions[::-1] + 1, sesh_score,zorder = 3)
     plt.ylim([np.min(flattened_values) - 10, np.max(flattened_values) + 10])
     plt.xticks(ticks=np.arange(1, len(labels) + 1), labels=labels, fontsize=12)  
     plt.xlabel('Puzzle Number', fontsize=14)
