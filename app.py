@@ -6,14 +6,18 @@ import secrets  # This is used for generating a secret key
 import numpy as np
 import os
 from datetime import datetime, timezone
-
+# import logging
+# logging.basicConfig(level=logging.DEBUG)
 # Function to get current UTC date and time
 utc_now = lambda: datetime.now(timezone.utc)
 app = Flask(__name__, static_folder='static')
-CORS(app, support_credentials = True, resources={r'/*': {'origins': 'https://simonhansedasi.github.io'}})
+# app.debug = True  # This turns on debug mode.
+# app.config['PROPAGATE_EXCEPTIONS'] = True
+
+# CORS(app, support_credentials = True, resources={r'/*': {'origins': 'https://simonhansedasi.github.io'}})
 
 # CORS(app, support_credentials = True, resources={r'/*': {'origins': ['https://02a885916215.ngrok.app','https://127.0.0.1:4000','https://simonhansedasi.github.io']}})
-# CORS(app, support_credentials=True, resources={r'/*': {'origins': ['http://127.0.0.1:4000']}})
+CORS(app, support_credentials=True, resources={r'/*': {'origins': ['http://127.0.0.1:4000']}})
 
 # app.config['PREFERRED_URL_SCHEME'] = 'https'
 
@@ -25,8 +29,8 @@ app.permanent_session_lifetime = 60 * 60 * 24 * 30  # 30 days
 
 @app.after_request
 def add_cors_headers(response):
-    response.headers['Access-Control-Allow-Origin'] = 'https://simonhansedasi.github.io'
-    # response.headers['Access-Control-Allow-Origin'] = 'http://127.0.0.1:4000'
+    # response.headers['Access-Control-Allow-Origin'] = 'https://simonhansedasi.github.io'
+    response.headers['Access-Control-Allow-Origin'] = 'http://127.0.0.1:4000'
     response.headers['Access-Control-Allow-Credentials'] = 'true'
     response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
@@ -70,6 +74,30 @@ def serve_static(filename):
     return send_from_directory('static', filename)
 
 
+
+
+
+@app.route('/sms', methods=['POST'])
+def sms_reply():
+    incoming_message = request.form['Body']
+
+    from_number = request.form['From']
+    print(from_number)
+    game, puzzle_number, clean_string = gr.clean_puzzle_input(incoming_message) 
+    print(game)
+    if gr.score_exists(from_number, puzzle_number, game):
+        response_message = f"Puzzle already scored."
+        return f"<Response><Message>{response_message}</Message></Response>"
+    else:
+        if game == 'connections':
+            score = gr.score_connections_puzzle(clean_string)
+        if game == 'strands':
+            score = gr.score_strands_puzzle(clean_string)  
+        response_message = f"Your score: {score}. Visit simonhansedasi.github.io/game_ranking to view more scores"
+        gr.insert_score(game, puzzle_number, score, session_id = from_number)
+        gr.update_ranking(game, puzzle_number)
+        # Twilio expects XML response
+        return f"<Response><Message>{response_message}</Message></Response>"
 
 
 
@@ -149,17 +177,14 @@ def get_ranking():
     # Query the database to get the current ranking for the game type
     
     row = gr.get_current_rank(game_type)
-    # print(row)
     
     
     rank = np.round(gr.get_current_rank(game_type),2)  # Implement this function to fetch the ranking
-    # print(rank, 'hhhhooo')
     if rank is None:
         return jsonify({'error': 'No ranking data available'}), 404
     # Convert NumPy int64 to Python int
     if isinstance(rank, (np.integer, np.floating)):
         rank = rank.item()
-    print(session_id)
     rows, col_names = gr.get_recent_scores()
     strands, connecs = gr.organize_data(rows)
     if game_type == 'connections':
@@ -171,8 +196,7 @@ def get_ranking():
 
         path = gr.plot_score_data(strands, game = 'strands',session_id = session_id)
         
-    print(path)
-    # print(rank)
+
     return jsonify(
         {
             'puzz1': str(np.round(rank[0][1],3)),
