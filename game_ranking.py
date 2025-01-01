@@ -17,6 +17,25 @@ def generate_unique_session_id():
     return str(uuid.uuid4())
 
 
+# wordle_score_map = {
+#     '⬜' : 2,
+#     '🟨' : 1,
+#     '🟩' : 0
+# }
+
+# def score_wordle_puzzle(wordle_string):
+    
+#     score = 0
+#     rows = wordle_string.strip().split("\n")
+#     ticker = 4
+#     for row in rows:
+#         if all(emoji == row[0] for emoji in row):
+#             score += (sum(connections_score_map[emoji] for emoji in row) * ticker)
+#             ticker -= 1
+#         else:
+#             score -= sum(connections_score_map[emoji] for emoji in row)
+#     return score
+
 
 
 
@@ -91,6 +110,13 @@ def score_strands_puzzle(strands_string):
     
     # print(f"Total score: {score}")
     return score
+
+
+
+
+
+
+
 
 
 
