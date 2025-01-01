@@ -10,9 +10,9 @@ from datetime import datetime, timezone
 # Function to get current UTC date and time
 utc_now = lambda: datetime.now(timezone.utc)
 app = Flask(__name__, static_folder='static')
-# CORS(app, support_credentials = True, resources={r'/*': {'origins': 'https://simonhansedasi.github.io'}})
+CORS(app, support_credentials = True, resources={r'/*': {'origins': 'https://simonhansedasi.github.io'}})
 
-CORS(app, support_credentials = True, resources={r'/*': {'origins': ['https://550fb17db6d8.ngrok.app','https://127.0.0.1:4000','https://simonhansedasi.github.io']}})
+# CORS(app, support_credentials = True, resources={r'/*': {'origins': ['https://02a885916215.ngrok.app','https://127.0.0.1:4000','https://simonhansedasi.github.io']}})
 # CORS(app, support_credentials=True, resources={r'/*': {'origins': ['http://127.0.0.1:4000']}})
 
 # app.config['PREFERRED_URL_SCHEME'] = 'https'
