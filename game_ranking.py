@@ -402,26 +402,21 @@ def plot_score_data(data,game,session_id):
     
     for key, item in session_scores:
         sesh_scores[key] = item 
+        
     sesh_scores = dict(sorted(sesh_scores.items()))
-    # print(sesh_scores)
-    labels = list(data.keys())[::-1]
 
+    labels = list(data.keys())[::-1]
     values = [data[key] for key in labels]
-    sesh_labels = list(sesh_scores.keys())[::-1] 
-    print(sesh_labels)
-    # for i in range(len(sesh_labels)):
-    #     sesh_labels[i] -= 1
-    # print(sesh_labels)
-    sesh_score = [sesh_scores[key] for key in sesh_scores.keys()]
-    # print(sesh_score)
+    
+    label_to_x = {label: idx + 1 for idx, label in enumerate(labels)}
+    
+    sesh_x_positions = [label_to_x[label] for label in sesh_scores if label in label_to_x]    
+    sesh_score = [sesh_scores[key] for key in sesh_scores if key in label_to_x]
+
     
     
-    iqrs = []
-    medians = []
-    q1s = []
-    q2s = []
-    # print(medians)
-    # print(values)
+    iqrs, medians, q1s, q2s = [], [], [], []
+
     for scores in values:
 
         q1 = np.percentile(scores, 75)
@@ -431,15 +426,13 @@ def plot_score_data(data,game,session_id):
         q1s.append(q1)
         q2s.append(q2)
         iqrs.append(iqr)
-        # medians.append(np.median(scores))
-    # print('poopsiepoop')   
-    # plt.scatter(sesh_score, 'x')
-    # print('scores scattered')
     x_positions = np.arange(len(labels))
-    sesh_x_positions = np.arange(len(sesh_labels))
-    plt.figure(figsize=(5, 3))  # Adjust the size to your desired dimensions
+    
+    
+    
+    
+    plt.figure(figsize=(5, 3)) 
 
-    # print(values)
     plt.boxplot(
         values, 
         patch_artist=True,               
@@ -452,20 +445,18 @@ def plot_score_data(data,game,session_id):
         capprops=dict(color="black", linewidth=1.5),       
         flierprops=dict(marker="o", color="blue", alpha=0.5)  
     )
-    # print('fdsafdsafdsa')
     if game == 'strands':
         game_title = 'Strands'
-        # print('whoop')
     if game == 'connections':
         game_title = 'Connections'
-        # print('whoopy ')
-    # print(scores)
-    # print('poopwop')
+    # if game == 'wordle':
+    #     game_title = 'Wordle'
+        
+
     flattened_values = sorted(np.concatenate([np.atleast_1d(v if isinstance(v, list) else [v]) for v in values if v]))
-    # if sesh_scores:
-        # print('weeee!!!')
-        # plt.scatter(sesh_score, 'x')
-    plt.scatter(sesh_x_positions[::-1] + 1, sesh_score,zorder = 3)
+
+    # plt.scatter(sesh_x_positions[::-1] + 1, sesh_score,zorder = 3)
+    plt.scatter(sesh_x_positions, sesh_score,zorder = 3)
     plt.ylim([np.min(flattened_values) - 10, np.max(flattened_values) + 10])
     plt.xticks(ticks=np.arange(1, len(labels) + 1), labels=labels, fontsize=12)  
     plt.xlabel('Puzzle Number', fontsize=14)
