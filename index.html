@@ -6,6 +6,11 @@
     <title>NYT Game Ranker</title>
 <style>
     /* Basic Reset */
+    p {
+    width: 80%;  /* Same width as hr */
+    margin: 0 auto 20px;  /* Center the paragraph and add some space at the bottom */
+    text-align: left;  /* Optional: Align text to the left */
+}
     body {
         font-family: Arial, sans-serif;
         margin: 0;
@@ -50,6 +55,28 @@
  <textarea id="puzzleString" rows="12" cols="15" placeholder="Enter puzzle results here"></textarea>
 <button onclick="submitScore()">Submit</button>
     <div class="score" id="dynamicScore"></div>
+
+    <p>
+        <strong>What am I looking at?</strong><br>
+        Each game has a custom scoring system with a minimum and maximum amount of points.
+    </p>
+    <p>
+        <strong>Connections</strong><br>
+        Points range from -60 to 120. '🟪' = 4 points, '🟦' = 3, '🟩' = 2, and '🟨' = 1 point. A mistake subtracts the row of points from the running score, and a correct answer adds the points for each square. Further, a multiplier is applied to correct answers: the first row of correct answers is worth x4, second row is x3, and so on. Guess the hard categories first for maximum score!
+        
+    </p>
+
+    <p>
+        <strong>Strands</strong><br>
+        Points range from ~ -85 to ~40. '🟡' = 10 points, '🔵' = 5 points, and '💡' = -5 points. The position of the yellow dot also is taken into account. A blue word found before the spanagram is worth minus points. To get max points, find the spanagram first!
+        
+    </p>
+
+    <p>
+        <strong>Wordle</strong><br>
+        Points range from 0 to 150. '⬜' = 5 points, '🟨' = 3 points, and '🟩' = 0 points. Each incorrect guess adds points, incorrect placement is worth fewer points. Guess the word with as few mistakes as possible and get the lowest score you can!
+        
+    </p>
 
     
     <p>
