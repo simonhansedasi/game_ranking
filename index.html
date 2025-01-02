@@ -47,14 +47,22 @@
 <body>
 
     <h1>NYT Game Ranker</h1>
+ <textarea id="puzzleString" rows="12" cols="15" placeholder="Enter puzzle results here"></textarea>
+<button onclick="submitScore()">Submit</button>
+    <div class="score" id="dynamicScore"></div>
+
+    
+    <p>
+    <hr style="border: .5px solid grey; width: 80%;">
+    <p>        
+    
     
     <h2>Connections Puzzle Scoring</h2>
     <div id="currentConnectionsRank"></div>
+    <br>
 
-    <div class="score" id="connectionsScore"></div>
+<!--     <div class="score" id="connectionsScore"></div> -->
 
-    <textarea id="connectionsString" rows="12" cols="15" placeholder="Enter the connections puzzle string here..."></textarea>
-    <button onclick="submitScore('connections')">Submit Score</button>
 <div class="plot-container">
     <img id="connectionsPlotImage" src="" alt="Recent Connections Scores Plot" />
     </div>
@@ -62,29 +70,28 @@
     
     
     <p>
+    <hr style="border: .5px solid grey; width: 80%;">
     <p>
     
     <h2>Strands Puzzle Scoring</h2>
     <div id="currentStrandsRank"></div>
-
-    <div class="score" id="strandsScore"></div>
-
-    <textarea id="strandsString" rows="12" cols="15" placeholder="Enter the strands puzzle string here..."></textarea>
-    <button onclick="submitScore('strands')">Submit Score</button>
     <br>
+
+<!--     <div class="score" id="strandsScore"></div> -->
+
     <div class="plot-container">
     <img id="strandsPlotImage" src="" alt="Recent Strands Scores Plot" />
     </div>
     
-    
-    
+    <p>
+    <hr style="border: .5px solid grey; width: 80%;">
+    <p>
+        
     <h2>Wordle Puzzle Scoring</h2>
     <div id="currentWordleRank"></div>
 
-    <div class="score" id="wordleScore"></div>
+<!--     <div class="score" id="wordleScore"></div> -->
 
-    <textarea id="wordleString" rows="12" cols="15" placeholder="Enter the wordle puzzle string here..."></textarea>
-    <button onclick="submitScore('wordle')">Submit Score</button>
     <br>
     <div class="plot-container">
     <img id="wordlePlotImage" src="" alt="Recent Wordle Scores Plot" />

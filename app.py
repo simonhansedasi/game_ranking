@@ -14,9 +14,9 @@ app = Flask(__name__, static_folder='static')
 # app.debug = True  # This turns on debug mode.
 # app.config['PROPAGATE_EXCEPTIONS'] = True
 
-CORS(app, support_credentials = True, resources={r'/*': {'origins': 'https://simonhansedasi.github.io'}})
+# CORS(app, support_credentials = True, resources={r'/*': {'origins': 'https://simonhansedasi.github.io'}})
 
-# CORS(app, support_credentials = True, resources={r'/*': {'origins': ['https://02a885916215.ngrok.app','https://127.0.0.1:4000','https://simonhansedasi.github.io']}})
+CORS(app, support_credentials = True, resources={r'/*': {'origins': ['https://02a885916215.ngrok.app','https://127.0.0.1:4000','https://simonhansedasi.github.io']}})
 # CORS(app, support_credentials=True, resources={r'/*': {'origins': ['http://127.0.0.1:4000']}})
 
 # app.config['PREFERRED_URL_SCHEME'] = 'https'
@@ -42,7 +42,6 @@ def ensure_session_id():
     # Ensure the session has an ID
     if 'session_id' not in session:
         session['session_id'] = str(uuid.uuid4())
-    # print(f"Session ID: {session['session_id']}")  # Debugging
     
     
 
@@ -82,9 +81,7 @@ def sms_reply():
     incoming_message = request.form['Body']
 
     from_number = request.form['From']
-    # print(from_number)
     game, puzzle_number, clean_string = gr.clean_puzzle_input(incoming_message) 
-    # print(game)
     if gr.score_exists(from_number, puzzle_number, game):
         response_message = f"Puzzle already scored."
         return f"<Response><Message>{response_message}</Message></Response>"
@@ -111,17 +108,9 @@ def serve_image(game_type):
 @app.route('/score_game', methods=['POST'])
 def score_game():
     data = request.get_json()
-    # ip_address = request.remote_addr
     game_string = data.get("puzzle_string")
-    # print(data)
     session_id = data.get('session_id')
-    # print(game_string)
-    # print('whaaaa')
-    # print(game_string)
     game, puzzle_number, clean_string = gr.clean_puzzle_input(game_string)
-    # print(game)
-    # print('data cleaned')
-    # print(game)
     if gr.score_exists(session_id, puzzle_number, game):
         print('no can do siree')
         return jsonify({'score': 'Score for this player and puzzle already submitted'}), 400
@@ -129,13 +118,10 @@ def score_game():
     
 #     current_puzzle_number = gr.get_current_puzzle(game)
 #     if not current_puzzle_number:
-#         print('wrong day?')
 #         return jsonify({'score': 'Game not found'}), 400
     
     
 #     if puzzle_number != current_puzzle_number:
-#         print(current_puzzle_number)
-#         print('wrong day')
 #         return jsonify({'score': 'puzzle does not match current day'}), 400
     else:
         if game == 'connections':
@@ -145,7 +131,6 @@ def score_game():
             score = gr.score_wordle_puzzle(clean_string)
         if game == 'strands':
             score = gr.score_strands_puzzle(clean_string)
-
         utc_timestamp = datetime.utcnow()  # Current UTC time
 
         gr.insert_score(game, puzzle_number, score, session_id)
@@ -153,8 +138,6 @@ def score_game():
 
         rows, col_names = gr.get_recent_scores()
         strands, connecs, wordle = gr.organize_data(rows)
-        # print(game)
-        # print(game)
         if game == 'connections':
             connecs = gr.drop_old_scores(connecs)
             path = gr.plot_score_data(connecs, game = 'connections', session_id = session_id)
@@ -166,17 +149,14 @@ def score_game():
             path = gr.plot_score_data(wordle, game = 'wordle', session_id = session_id)
 
         # else:
-        #     print('Invalid game type')
         #     return jsonify({'score': 'Invalid game type'}), 400
 
         rank = gr.get_ranking(game, puzzle_number)
-
         return jsonify({"score": score, "rank" : rank, "path" : f'/{path}'})
 
 @app.route('/get_ranking', methods=['GET'])
 def get_ranking():
     game_type = request.args.get('game_type')
-    # print(game_type)
     session_id = request.args.get('session_id')
     if not game_type:
         return jsonify({'error': 'Game type is required'}), 400
@@ -194,7 +174,6 @@ def get_ranking():
         rank = rank.item()
     rows, col_names = gr.get_recent_scores()
     strands, connecs, wordle = gr.organize_data(rows)
-    # print(strands)
     if game_type == 'connections':
         connecs = gr.drop_old_scores(connecs)
         path = gr.plot_score_data(connecs, game = 'connections',session_id = session_id)
@@ -233,5 +212,5 @@ if __name__ == '__main__':
     # Populate puzzles for two games (customize as needed)
     gr.populate_puzzle_dates(game_type="connections", start_puzzle_number=550, start_date="2024-12-12", num_days=999)
     gr.populate_puzzle_dates(game_type="strands", start_puzzle_number=284, start_date="2024-12-12", num_days=999)
-    gr.populate_puzzle_dates(game_type="wordle", start_puzzle_number=1288, start_date="2025-01-01", num_days=999)
+    gr.populate_puzzle_dates(game_type="wordle", start_puzzle_number=1292, start_date="2025-01-01", num_days=999)
     app.run(debug=True, port = 5005)

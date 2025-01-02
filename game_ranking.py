@@ -109,13 +109,14 @@ def score_wordle_puzzle(wordle_string):
 
     rows = wordle_string.strip().split('\n')
 
-    for row in rows[2:]:
+    for row in rows:
         for emoji in row:
+            print(emoji)
             score += (wordle_score_map[emoji])            
         
         if all(emoji == '🟩' for emoji in row):
-            return score
-
+            break
+    return score
 
 
 
