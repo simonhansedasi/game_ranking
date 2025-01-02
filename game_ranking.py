@@ -17,28 +17,6 @@ def generate_unique_session_id():
     return str(uuid.uuid4())
 
 
-# wordle_score_map = {
-#     '⬜' : 2,
-#     '🟨' : 1,
-#     '🟩' : 0
-# }
-
-# def score_wordle_puzzle(wordle_string):
-    
-#     score = 0
-#     rows = wordle_string.strip().split("\n")
-#     ticker = 4
-#     for row in rows:
-#         if all(emoji == row[0] for emoji in row):
-#             score += (sum(connections_score_map[emoji] for emoji in row) * ticker)
-#             ticker -= 1
-#         else:
-#             score -= sum(connections_score_map[emoji] for emoji in row)
-#     return score
-
-
-
-
 connections_score_map = {
     '🟨' : 1,
     '🟩' : 2,
@@ -54,9 +32,13 @@ def clean_puzzle_input(puzzle_string):
         
     if game == 'connections':
         puzzle_number = lines[1].split("#")[1].strip()
+        
+    if game == 'wordle':
+        puzzle_number = int(lines[0].split(" ")[1].strip().replace(',',''))
+
     # elif game != 'Strands' or 'Connections':
     #     puzzle_number = None
-    print(puzzle_number)
+    # print(puzzle_number)
     puzzle_lines = lines[2:]
 
     clean_puzzle_string = "\n".join(puzzle_lines)
@@ -114,7 +96,25 @@ def score_strands_puzzle(strands_string):
 
 
 
+wordle_score_map = {
+    '⬜' : 5,
+    '🟨' : 3,
+    '🟩' : 0
+}
 
+
+def score_wordle_puzzle(wordle_string):
+
+    score = 0
+
+    rows = wordle_string.strip().split('\n')
+
+    for row in rows[2:]:
+        for emoji in row:
+            score += (wordle_score_map[emoji])            
+        
+        if all(emoji == '🟩' for emoji in row):
+            return score
 
 
 
@@ -380,6 +380,7 @@ def get_recent_scores(puzzle_number = None, db_file = 'rankings.db'):
 def organize_data(rows):
     strands = {}
     connecs = {}
+    wordle = {}
     for item in rows:
 
         game = item[0]
@@ -395,13 +396,19 @@ def organize_data(rows):
             if puzzle_number not in connecs:
                 connecs[puzzle_number] = []
             connecs[puzzle_number].append(score)
-    return strands, connecs
+            
+        if game == 'wordle':
+            if puzzle_number not in wordle:
+                wordle[puzzle_number] = []
+            wordle[puzzle_number].append(score)
+    return strands, connecs, wordle
 
 
 
 def drop_old_scores(data):
     if data == {}:
         return
+    # print(data.keys())
     max_key = max(data.keys())
     keys_to_keep = [key for key in data.keys() if key >= max_key - 4]
     data = {key: data[key] for key in keys_to_keep}
@@ -420,7 +427,7 @@ def plot_score_data(data,game,session_id):
         return
     data = dict(sorted(data.items()))
     
-    
+    # print(data)
     data = drop_old_scores(data)
     # print(data)
     
@@ -475,9 +482,11 @@ def plot_score_data(data,game,session_id):
         game_title = 'Strands'
     if game == 'connections':
         game_title = 'Connections'
+    if game == 'wordle':
+        game_title = 'Wordle'
     # if game == 'wordle':
     #     game_title = 'Wordle'
-        
+    # print(game_title)
 
     flattened_values = sorted(np.concatenate([np.atleast_1d(v if isinstance(v, list) else [v]) for v in values if v]))
 

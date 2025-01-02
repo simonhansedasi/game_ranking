@@ -78,8 +78,22 @@
     
     
     
+    <h2>Wordle Puzzle Scoring</h2>
+    <div id="currentWordleRank"></div>
 
-    <script src="js/sess_id.js" defer></script>
+    <div class="score" id="wordleScore"></div>
+
+    <textarea id="wordleString" rows="12" cols="15" placeholder="Enter the wordle puzzle string here..."></textarea>
+    <button onclick="submitScore('wordle')">Submit Score</button>
+    <br>
+    <div class="plot-container">
+    <img id="wordlePlotImage" src="" alt="Recent Wordle Scores Plot" />
+    </div>
+    
+    
+    
+
+  <script src="js/sess_id.js" defer></script>
   <script src="js/fetch_ranking.js" defer></script>
   <script src="js/submit_score.js" defer></script>
 

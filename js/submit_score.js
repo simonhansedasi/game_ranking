@@ -16,6 +16,11 @@ function submitScore(gameType) {
                 scoreElementId = "strandsScore";
                 rankElementId = "currentStrandsRank";
                 plotImageElement = document.getElementById('strandsPlotImage');
+            } else if (gameType === 'wordle') {
+                puzzleString = document.getElementById("wordleString").value;
+                scoreElementId = "wordleScore";
+                rankElementId = "currentWordleRank";
+                plotImageElement = document.getElementById('wordlePlotImage');
             }
 
             if (!plotImageElement) {
