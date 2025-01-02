@@ -12,18 +12,32 @@
 
 
 
+function fetchAndDisplayRank(gameType, baseURL) {
+    // Determine the appropriate rank element ID based on the game type
+    let rankElementId;
+    let plotImageElement;
+    
+    if (gameType === 'connections') {
+        rankElementId = 'currentConnectionsRank';
+        plotImageElement = document.getElementById('connectionsPlotImage');
+    } else if (gameType === 'strands') {
+        rankElementId = 'currentStrandsRank';
+        plotImageElement = document.getElementById('strandsPlotImage');
+    } else if (gameType === 'wordle') {
+        rankElementId = 'currentWordleRank';
+        plotImageElement = document.getElementById('wordlePlotImage');
+    } else {
+        console.error('Invalid game type:', gameType);
+        return; // Exit the function if the game type is invalid
+    }
 
+    // Retrieve session ID
+    const session_id = getCookie('session_id'); 
 
-    // Function to fetch and display the current ranking
-    function fetchAndDisplayRank(gameType, baseURL) {
-        const rankElementId = gameType === 'connections' ? 'currentConnectionsRank' : 'currentStrandsRank';
-        const plotImageElement = gameType === 'connections'
-            ? document.getElementById('connectionsPlotImage') 
-            : document.getElementById('strandsPlotImage');
-        const session_id = getCookie('session_id'); // Retrieve session ID
-        const requestBody = {
+    // Create the request body with game type and session ID
+    const requestBody = {
         game_type: gameType,
-        session_id: session_id, // Include session ID in the request body
+        session_id: session_id,
     };
 
         // const baseURL = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost'
@@ -90,6 +104,7 @@ window.onload = function () {
         .then(baseURL => {
             fetchAndDisplayRank('connections', baseURL);
             fetchAndDisplayRank('strands', baseURL);
+            fetchAndDisplayRank('wordle', baseURL);
         })
         .catch(error => {
             console.error('Error fetching base URL:', error);
