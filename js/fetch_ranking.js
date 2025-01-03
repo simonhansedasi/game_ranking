@@ -71,10 +71,14 @@ function fetchAndDisplayRank(gameType, baseURL) {
                 for (let i = 1; i <= 5; i++) {
                     const puzzleKey = `puzz${i}`;
                     const rankKey = `rank${i}`;
+                    const dateKey = `date${i}`;
                     if (data[puzzleKey]) {
                         // Create a new div for each rank entry
                         const entry = document.createElement("div");
-                        entry.innerHTML = `Puzzle ${parseFloat(data[puzzleKey])}: ${parseFloat(data[rankKey])}`;
+                        
+                            const formattedDate = data[dateKey] ? data[dateKey].toString() : 'N/A';
+
+                        entry.innerHTML = `# ${i} ${formattedDate} -- Puzzle ${parseFloat(data[puzzleKey])} <br> &mu; = ${'poops'}; &sigma;<sup>2</sup>  = ${'poopsy'}; D = ${parseFloat(data[rankKey])}<br><br><br>`;
                         container.appendChild(entry);
                     }
                 }

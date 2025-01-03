@@ -46,7 +46,7 @@ def clean_puzzle_input(puzzle_string):
     return game, puzzle_number, clean_puzzle_string
 
 def score_connections_puzzle(connections_string):
-    score = 0
+    score = 60
     rows = connections_string.strip().split("\n")
     ticker = 4
     for row in rows:
@@ -68,7 +68,7 @@ strands_score_map = {
 
 def score_strands_puzzle(strands_string):
     # yellow_pos = []
-    score = 0
+    score = 100
     yellow_pos = len(strands_string)
     for index, emoji in enumerate(strands_string):
         # print(index)
@@ -277,30 +277,68 @@ def get_session_scores(session_id, game_type ):
     
     return scores
 
-
-
 def update_ranking(game_type, puzzle_number):
     conn = sqlite3.connect('rankings.db')
     cursor = conn.cursor()
-
+    
     # Calculate the new average score
     cursor.execute('''
-        SELECT AVG(score) 
+        SELECT score
         FROM puzzles 
         WHERE game_type = ? AND puzzle_number = ?
     ''', (game_type, puzzle_number))
-    average_score = cursor.fetchone()[0]
+    rows = cursor.fetchall()
 
-    # Update the rankings table with the new average score
+    scores = []
+    for item in rows:
+        score = item[0]
+        scores.append(score)
+
+    m = np.mean(scores)
+    var = np.var(scores)
+    # print(m, var)
+    a = 1.5
+    b = 1
+    n = len(scores)
+
+    if game_type == 'wordle':
+        D = np.round((a * (m)) + (b * var) + (1/n))
+    else:
+        D = np.round((a * (1/m)) - (b * var) + (1/n))
     cursor.execute('''
         INSERT INTO rankings (game_type, puzzle_number, ranking)
         VALUES (?, ?, ?)
         ON CONFLICT(game_type, puzzle_number) DO UPDATE SET 
         ranking = excluded.ranking
-    ''', (game_type, puzzle_number, average_score))
-
+    ''', (game_type, puzzle_number, D))
+    
+    
     conn.commit()
     conn.close()
+    return
+
+# def update_ranking(game_type, puzzle_number):
+#     conn = sqlite3.connect('rankings.db')
+#     cursor = conn.cursor()
+
+#     # Calculate the new average score
+#     cursor.execute('''
+#         SELECT AVG(score) 
+#         FROM puzzles 
+#         WHERE game_type = ? AND puzzle_number = ?
+#     ''', (game_type, puzzle_number))
+#     average_score = cursor.fetchone()[0]
+
+#     # Update the rankings table with the new average score
+#     cursor.execute('''
+#         INSERT INTO rankings (game_type, puzzle_number, ranking)
+#         VALUES (?, ?, ?)
+#         ON CONFLICT(game_type, puzzle_number) DO UPDATE SET 
+#         ranking = excluded.ranking
+#     ''', (game_type, puzzle_number, average_score))
+
+#     conn.commit()
+#     conn.close()
 
 
 
@@ -327,11 +365,11 @@ def get_current_rank(game_type):
 
     # Check if a puzzle date exists for the game type
     cursor.execute("""
-        SELECT r.ranking, r.puzzle_number
+        SELECT r.ranking, r.puzzle_number, COALESCE(pd.puzzle_date, 'N/A') as date
         FROM rankings r
         JOIN puzzle_dates pd ON r.game_type = pd.game_type AND r.puzzle_number = pd.puzzle_number
         WHERE r.game_type = ?
-        ORDER BY r.puzzle_number DESC LIMIT 5
+        ORDER BY r.ranking DESC LIMIT 5
     """, (game_type,))
 
     row = cursor.fetchall()
@@ -341,7 +379,7 @@ def get_current_rank(game_type):
     
     
     while len(row) < 5:
-        row.append((0, 0))
+        row.append((0, 0, '0'))
 
     return row
 

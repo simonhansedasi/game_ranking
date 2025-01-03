@@ -111,9 +111,9 @@ def score_game():
     game_string = data.get("puzzle_string")
     session_id = data.get('session_id')
     game, puzzle_number, clean_string = gr.clean_puzzle_input(game_string)
-    if gr.score_exists(session_id, puzzle_number, game):
-        print('no can do siree')
-        return jsonify({'score': 'Score for this player and puzzle already submitted'}), 400
+    # if gr.score_exists(session_id, puzzle_number, game):
+    #     print('no can do siree')
+    #     return jsonify({'score': 'Score for this player and puzzle already submitted'}), 400
     
     
 #     current_puzzle_number = gr.get_current_puzzle(game)
@@ -123,36 +123,36 @@ def score_game():
     
 #     if puzzle_number != current_puzzle_number:
 #         return jsonify({'score': 'puzzle does not match current day'}), 400
-    else:
-        if game == 'connections':
-            score = gr.score_connections_puzzle(clean_string)
-            
-        if game == 'wordle':
-            score = gr.score_wordle_puzzle(clean_string)
-        if game == 'strands':
-            score = gr.score_strands_puzzle(clean_string)
-        utc_timestamp = datetime.utcnow()  # Current UTC time
+    # else:
+    if game == 'connections':
+        score = gr.score_connections_puzzle(clean_string)
 
-        gr.insert_score(game, puzzle_number, score, session_id)
-        gr.update_ranking(game, puzzle_number)
+    if game == 'wordle':
+        score = gr.score_wordle_puzzle(clean_string)
+    if game == 'strands':
+        score = gr.score_strands_puzzle(clean_string)
+    utc_timestamp = datetime.utcnow()  # Current UTC time
 
-        rows, col_names = gr.get_recent_scores()
-        strands, connecs, wordle = gr.organize_data(rows)
-        if game == 'connections':
-            connecs = gr.drop_old_scores(connecs)
-            path = gr.plot_score_data(connecs, game = 'connections', session_id = session_id)
+    gr.insert_score(game, puzzle_number, score, session_id)
+    gr.update_ranking(game, puzzle_number)
 
-        if game == 'strands':
-            path = gr.plot_score_data(strands, game = 'strands', session_id = session_id)
-            
-        if game == 'wordle':
-            path = gr.plot_score_data(wordle, game = 'wordle', session_id = session_id)
+    rows, col_names = gr.get_recent_scores()
+    strands, connecs, wordle = gr.organize_data(rows)
+    if game == 'connections':
+        connecs = gr.drop_old_scores(connecs)
+        path = gr.plot_score_data(connecs, game = 'connections', session_id = session_id)
 
-        # else:
-        #     return jsonify({'score': 'Invalid game type'}), 400
+    if game == 'strands':
+        path = gr.plot_score_data(strands, game = 'strands', session_id = session_id)
 
-        rank = gr.get_ranking(game, puzzle_number)
-        return jsonify({"score": score, "rank" : rank, "path" : f'/{path}'})
+    if game == 'wordle':
+        path = gr.plot_score_data(wordle, game = 'wordle', session_id = session_id)
+
+    # else:
+    #     return jsonify({'score': 'Invalid game type'}), 400
+
+    rank = gr.get_ranking(game, puzzle_number)
+    return jsonify({"score": score, "rank" : rank, "path" : f'/{path}'})
 
 @app.route('/get_ranking', methods=['GET'])
 def get_ranking():
@@ -166,7 +166,10 @@ def get_ranking():
     row = gr.get_current_rank(game_type)
     
     
-    rank = np.round(gr.get_current_rank(game_type),2)  # Implement this function to fetch the ranking
+    rank = (gr.get_current_rank(game_type))  # Implement this function to fetch the ranking
+    # while len(rank) < 5:
+    #     rank.append((3, 0, 7))
+    print(rank)
     if rank is None:
         return jsonify({'error': 'No ranking data available'}), 404
     # Convert NumPy int64 to Python int
@@ -191,15 +194,20 @@ def get_ranking():
 
     return jsonify(
         {
-            'puzz1': str(np.round(rank[0][1],3)),
+            'date1': str(rank[0][2]),
+            'puzz1': str(rank[0][1]),
             'rank1': str(rank[0][0]),
+            'date2': str(rank[1][2]),
             'puzz2': str(rank[1][1]),
             'rank2': str(rank[1][0]),
+            'date3': str(rank[2][2]),
             'puzz3': str(rank[2][1]),
             'rank3': str(rank[2][0]),
+            'date4': str(rank[3][2]),
             'puzz4': str(rank[3][1]),
             'rank4': str(rank[3][0]),
             
+            'date5': str(rank[4][2]),
             'puzz5': str(rank[4][1]),
             'rank5': str(rank[4][0]),
             # "path" : f"/{path}"
