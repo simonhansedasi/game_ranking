@@ -301,6 +301,7 @@ def update_ranking(game_type, puzzle_number):
     
     a = 1 if game_type == 'wordle' else 1.5
     b = 0.1 * m / var
+    # b = 0.00000000001
     n = len(scores)
     # print(b, var)
     
@@ -318,9 +319,9 @@ def update_ranking(game_type, puzzle_number):
         alpha = a * (1/(m + gamma))
         beta = b * norm_var
         N = 1/n        
-        D = np.round(alpha - beta + N, 5)
+        D = np.round(alpha + beta + N, 5)
         
-    D = np.clip(D * 1000, 1, 1000)
+        D = np.clip(D * 1000, 1, 10000)
     
     D = np.round(D, 2)
 
