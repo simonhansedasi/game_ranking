@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('Agg')  # Use non-GUI backend
 import os
+import scipy.stats as st
 
 
 
@@ -288,35 +289,40 @@ def update_ranking(game_type, puzzle_number):
     for item in rows:
         score = item[0]
         scores.append(score)
+        
     m = np.mean(scores)
     var = np.var(scores)
     gamma = 1
     var = var + gamma
+    skew = st.skew(scores)
     
     a = 1 if game_type == 'wordle' else 15
-    b = 0.1 * m / var
-    # b = 0.00000000001
+    # b = 0.1 * m / var
+    b = 0.015
     n = len(scores)
-    
-    
+    skew_factor = 1 + (0.01 * skew)
     norm_var = np.sqrt(var) / (m)
+    
+    
     if game_type == 'wordle':
         alpha = a * m
         beta = b * (norm_var)
         N = 1/n
         
-        D = np.round(alpha + beta, 5)
+        D = np.round((alpha + beta) / (skew_factor), 5)
         
     else:
         alpha = a * (1/(m + gamma))
         beta = b * norm_var
         N = 1/n        
-        D = np.round(alpha + beta, 5)
+        
+        
+        D = np.round((alpha + beta) / (skew_factor), 5)
         
         D = np.clip(D * 1000, 1, 10000)
     
     D = np.round(D, 2)
-
+    print(game_type, alpha, m,beta, skew_factor, D)
     cursor.execute('''
         INSERT INTO rankings (game_type, puzzle_number, ranking)
         VALUES (?, ?, ?)
