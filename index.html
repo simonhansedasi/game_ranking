@@ -115,7 +115,7 @@
        
 <!--         The puzzle's "rank" is a difficulty rating calculated using the parameters of the score distribution. <strong>&mu;</strong> is the mean score and <strong>&sigma;</strong> is the standard deviation of scores. These parameters are adjusted with weights <strong>&alpha;</strong> and <strong>&beta;</strong> to assign priority to the distribution mean and variance. A skew factor <strong>&delta;</strong> adjusts the difficulty for outliers. -->
     </p>
-    <p>For Wordle, difficulty of the puzzle can be thought of as increasing with the score. The difficulty of Wordle puzzles is quantified as follows,
+<!--     <p>For Wordle, difficulty of the puzzle can be thought of as increasing with the score. The difficulty of Wordle puzzles is quantified as follows,
     <p class="equation">
         D = &delta;
         [
@@ -123,15 +123,15 @@
         <span class="fraction">
             <span class="top">&sigma;</span>
             <span class="bottom">&mu;</span>
-        </span>
+        </span> -->
 <!--         + 
         <span class="fraction">
             <span class="top">1</span>
             <span class="bottom">n</span>
         </span> -->
         ]
-    </p>
-    
+<!--     </p> -->
+<!--     
     <p>For Connections and Strands, lower scores indicate a harder puzzle, so the difficulty will increase inversely to the mean of the score distribution. A tiny decimal <strong>&gamma;</strong> is added to avoid dividing by zero. The difficulty of these puzzles is quantified as, 
     <p class="equation">
         D = &delta;
@@ -153,8 +153,7 @@
             <span class="bottom">n</span>
         </span> -->
         ]
-    </p>
-    
+<!--     </p> -->
     
     
     <p>
