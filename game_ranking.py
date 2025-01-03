@@ -302,11 +302,11 @@ def update_ranking(game_type, puzzle_number):
     a = 1 if game_type == 'wordle' else 1.5
     b = 0.1 * m / var
     n = len(scores)
-    print(b, var)
+    # print(b, var)
     
     
     norm_var = var / (m**2)
-    print(norm_var)
+    # print(norm_var)
     if game_type == 'wordle':
         alpha = a * m
         beta = b * (norm_var)

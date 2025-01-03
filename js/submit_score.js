@@ -1,5 +1,7 @@
 function submitScore() {
-    const puzzleString = document.getElementById("puzzleString").value.trim();
+    const puzzleStringInput = document.getElementById("puzzleString");
+
+    const puzzleString = puzzleStringInput.value.trim();
     const gameType = puzzleString.split(/\s+/)[0].toLowerCase(); // Detect game type from first word
     const scoreElement = document.getElementById("dynamicScore");
     let plotImageElement;
