@@ -61,7 +61,7 @@ def score_connections_puzzle(connections_string):
 
 strands_score_map = {
     '🟡' : 10,
-    '🔵' : 2,
+    '🔵' : 5,
     '💡' : -5
 }
 
@@ -79,7 +79,7 @@ def score_strands_puzzle(strands_string):
             # Blue has different scores depending on its position relative to yellow
             # for yellow_position in yellow_positions:
             if index < yellow_pos:
-                score -= strands_score_map[emoji]  # Blue is to the left of yellow (negative)
+                score += 2  # Blue is to the left of yellow (negative)
                 # break
             elif index > yellow_pos:
                 score += strands_score_map[emoji]  # Blue is to the right of yellow (positive)
