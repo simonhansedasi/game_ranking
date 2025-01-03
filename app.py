@@ -111,9 +111,9 @@ def score_game():
     game_string = data.get("puzzle_string")
     session_id = data.get('session_id')
     game, puzzle_number, clean_string = gr.clean_puzzle_input(game_string)
-    # if gr.score_exists(session_id, puzzle_number, game):
-    #     print('no can do siree')
-    #     return jsonify({'score': 'Score for this player and puzzle already submitted'}), 400
+    if gr.score_exists(session_id, puzzle_number, game):
+        print('no can do siree')
+        return jsonify({'score': 'Score for this player and puzzle already submitted'}), 400
     
     
 #     current_puzzle_number = gr.get_current_puzzle(game)
