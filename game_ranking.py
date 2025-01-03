@@ -38,7 +38,6 @@ def clean_puzzle_input(puzzle_string):
 
     # elif game != 'Strands' or 'Connections':
     #     puzzle_number = None
-    # print(puzzle_number)
     puzzle_lines = lines[2:]
 
     clean_puzzle_string = "\n".join(puzzle_lines)
@@ -71,8 +70,6 @@ def score_strands_puzzle(strands_string):
     score = 85
     yellow_pos = len(strands_string)
     for index, emoji in enumerate(strands_string):
-        # print(index)
-        # print(yellow_pos)
         if emoji == '🟡':
             # Yellow always adds +10
             score += strands_score_map[emoji]
@@ -91,7 +88,6 @@ def score_strands_puzzle(strands_string):
             score += strands_score_map[emoji]
     if score < 0:
         score = 0
-    # print(f"Total score: {score}")
     return score
 
 
@@ -112,7 +108,6 @@ def score_wordle_puzzle(wordle_string):
 
     for row in rows:
         for emoji in row:
-            print(emoji)
             score += (wordle_score_map[emoji])            
         
         if all(emoji == '🟩' for emoji in row):
@@ -196,7 +191,6 @@ def populate_puzzle_dates(game_type, start_puzzle_number, start_date, num_days):
             """, (game_type, puzzle_number, puzzle_date.isoformat()))
         except sqlite3.IntegrityError:
             continue
-            # print(f"Skipping duplicate entry for {game_type} puzzle {puzzle_number} on {puzzle_date}.")
 
     conn.commit()
     conn.close()
@@ -296,30 +290,28 @@ def update_ranking(game_type, puzzle_number):
         scores.append(score)
     m = np.mean(scores)
     var = np.var(scores)
-    gamma = 1e-6
+    gamma = 1
     var = var + gamma
     
-    a = 1 if game_type == 'wordle' else 1.5
+    a = 1 if game_type == 'wordle' else 15
     b = 0.1 * m / var
     # b = 0.00000000001
     n = len(scores)
-    # print(b, var)
     
     
-    norm_var = var / (m**2)
-    # print(norm_var)
+    norm_var = np.sqrt(var) / (m)
     if game_type == 'wordle':
         alpha = a * m
         beta = b * (norm_var)
         N = 1/n
         
-        D = np.round(alpha + beta + N, 5)
+        D = np.round(alpha + beta, 5)
         
     else:
         alpha = a * (1/(m + gamma))
         beta = b * norm_var
         N = 1/n        
-        D = np.round(alpha + beta + N, 5)
+        D = np.round(alpha + beta, 5)
         
         D = np.clip(D * 1000, 1, 10000)
     
@@ -472,9 +464,9 @@ def calculate_parameters(scores):
     for puzzle, scores in scores.items():
         mu = np.round(np.mean(scores), 2)
         
-        var = np.round(np.std(scores), 2)
+        std = np.round(np.std(scores), 2)
         
-        params[puzzle] = (mu, var)
+        params[puzzle] = (mu, std)
         
     return params
 
@@ -511,7 +503,6 @@ def organize_data(rows):
 def drop_old_scores(data):
     if data == {}:
         return
-    # print(data.keys())
     max_key = max(data.keys())
     keys_to_keep = [key for key in data.keys() if key >= max_key - 4]
     data = {key: data[key] for key in keys_to_keep}
@@ -519,20 +510,15 @@ def drop_old_scores(data):
     return data
 
 def plot_score_data(data,game,session_id):
-    # print(data)
-    # print(game)
     
     session_scores = get_session_scores(session_id, game )
-    # print(session_scores)
     
     
     if data == None:
         return
     data = dict(sorted(data.items()))
     
-    # print(data)
     data = drop_old_scores(data)
-    # print(data)
     
     sesh_scores = {}
     
@@ -589,7 +575,6 @@ def plot_score_data(data,game,session_id):
         game_title = 'Wordle'
     # if game == 'wordle':
     #     game_title = 'Wordle'
-    # print(game_title)
 
     flattened_values = sorted(np.concatenate([np.atleast_1d(v if isinstance(v, list) else [v]) for v in values if v]))
 
@@ -604,7 +589,6 @@ def plot_score_data(data,game,session_id):
     plt.gca().invert_xaxis()
 
     output_path = f'static/images/{game}_recent_scores.png'
-    # print(output_path)
     
     plt.savefig(output_path, bbox_inches = 'tight')
     plt.close()

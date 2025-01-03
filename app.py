@@ -112,7 +112,7 @@ def score_game():
     session_id = data.get('session_id')
     game, puzzle_number, clean_string = gr.clean_puzzle_input(game_string)
     if gr.score_exists(session_id, puzzle_number, game):
-        print('no can do siree')
+        # print('no can do siree')
         return jsonify({'score': 'Score for this player and puzzle already submitted'}), 400
     
     
@@ -200,13 +200,13 @@ def get_ranking():
         puzzle_number = entry[1]
 
         # Fetch mean and variance from the dictionary; default to (0, 0) if not found
-        mu, var = params.get(puzzle_number, (0, 0))
+        mu, std = params.get(puzzle_number, (0, 0))
 
         response[f'date{index}'] = str(entry[2])
         response[f'puzz{index}'] = str(puzzle_number)
         response[f'rank{index}'] = str(entry[0])
         response[f'mu{index}'] = str(mu)
-        response[f'var{index}'] = str(var)
+        response[f'var{index}'] = str(std)
 
     return jsonify(response)
 
