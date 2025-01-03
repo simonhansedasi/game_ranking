@@ -100,7 +100,7 @@
 
     <p>
         <strong>Strands</strong><br>
-        Points range from 0 to . '🟡' = 10 points, '🔵' = 5 points, and '💡' = -5 points. The position of the yellow dot also is taken into account. A blue word found before the spanagram is worth minus points. To get max points, find the spanagram first!
+        Points range from 0 to ~135. '🟡' = 10 points, '🔵' = 5 points, and '💡' = -5 points. The position of the yellow dot also is taken into account. A blue word found before the spanagram is worth minus points. To get max points, find the spanagram first!
         
     </p>
 
@@ -112,26 +112,28 @@
     <p>
         <strong>Puzzle Scoring and Ranking</strong><br>
         The plots below depict the distribution of scores for recent puzzles. The rectangle represents the 75th and 25th quartiles, and the black line shows the median of the distribution. The "whiskers" on top and bottom mark the end points of the distribution. A blue dot depicts the score submitted by the viewer.<br><br>
-        The puzzle's "rank" is a difficulty rating calculated using the parameters of the score distribution. <strong>&mu;</strong> is the mean score, <strong>&sigma;<sup>2</sup></strong> is the variance of scores, and <strong>n</strong> is the number of scored puzzles.
+        The puzzle's "rank" is a difficulty rating calculated using the parameters of the score distribution. <strong>&mu;</strong> is the mean score, <strong>&sigma; </strong>is the standard deviation of scores, and <strong>n</strong> is the number of scored puzzles. These parameters are adjusted with weights <strong>&alpha;</strong> and <strong>&beta;</strong> to assign priority to the distribution mean and variance.
     </p>
     <p>For Wordle, difficulty of the puzzle can be thought of as increasing with the score. The difficulty of Wordle puzzles is quantified as follows,
     <p class="equation">
-        D = &alpha; μ + &beta; σ<sup>2</sup> + 
+        D = &alpha; &mu; + &beta; &sigma;<sup>2</sup> 
+        + 
         <span class="fraction">
             <span class="top">1</span>
             <span class="bottom">n</span>
         </span>
     </p>
     
-    <p>For Connections and Strands, lower scores indicate a harder puzzle, so the difficulty will increase inversely to the mean of the score distribution. The difficulty of these puzzles is quantified as, 
+    <p>For Connections and Strands, lower scores indicate a harder puzzle, so the difficulty will increase inversely to the mean of the score distribution. A tiny decimal <strong>&gamma;</strong> is added to avoid dividing by zero. The difficulty of these puzzles is quantified as, 
     <p class="equation">
         D = &alpha;
         <span class="fraction">
-            <span class="top">1000</span>
+            <span class="top">1</span>
             <span class="bottom">&mu; + &gamma;</span>
         </span>
         
-        + &beta; σ<sup>2</sup> + 
+        + &beta; &sigma;<sup>2</sup> 
+        + 
         <span class="fraction">
             <span class="top">1</span>
             <span class="bottom">n</span>

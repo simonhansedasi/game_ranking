@@ -295,28 +295,35 @@ def update_ranking(game_type, puzzle_number):
         score = item[0]
         scores.append(score)
     m = np.mean(scores)
-    score_range = max(scores) - min(scores)
-    # print(score_range)
     var = np.var(scores)
-    # print(m, var)
-    a = 20
-    b = .025
+    gamma = 1e-6
+    var = var + gamma
+    
+    a = 1 if game_type == 'wordle' else 1.5
+    b = 0.1 * m / var
     n = len(scores)
+    print(b, var)
     
     
+    norm_var = var / (m**2)
+    print(norm_var)
     if game_type == 'wordle':
         alpha = a * m
-        beta = b * (var)
+        beta = b * (norm_var)
         N = 1/n
         
-        D = np.round(alpha + beta + N, 0)
+        D = np.round(alpha + beta + N, 5)
         
     else:
-        alpha = a * (1000/(m + 1e-5))
-        beta = b * (var)
+        alpha = a * (1/(m + gamma))
+        beta = b * norm_var
         N = 1/n        
-        D = np.round(alpha + beta + N, 0)
-    # print(D)print
+        D = np.round(alpha - beta + N, 5)
+        
+    D = np.clip(D * 1000, 1, 1000)
+    
+    D = np.round(D, 2)
+
     cursor.execute('''
         INSERT INTO rankings (game_type, puzzle_number, ranking)
         VALUES (?, ?, ?)
@@ -464,7 +471,7 @@ def calculate_parameters(scores):
     for puzzle, scores in scores.items():
         mu = np.round(np.mean(scores), 2)
         
-        var = np.round(np.var(scores), 2)
+        var = np.round(np.std(scores), 2)
         
         params[puzzle] = (mu, var)
         

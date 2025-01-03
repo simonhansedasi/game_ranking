@@ -3,6 +3,7 @@ function submitScore() {
     const gameType = puzzleString.split(/\s+/)[0].toLowerCase(); // Detect game type from first word
     const scoreElement = document.getElementById("dynamicScore");
     let plotImageElement;
+    puzzleStringInput.value = '';
 
     // Determine plot image based on game type
     if (gameType === 'connections') {
