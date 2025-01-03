@@ -90,71 +90,13 @@
 
     <p>
         <strong>What am I looking at?</strong><br>
-        Each game has a custom scoring system with a minimum and maximum amount of points.
-    </p>
-    <p>
-        <strong>Connections</strong><br>
-        Points range from 0 to 180. '🟪' = 4 points, '🟦' = 3, '🟩' = 2, and '🟨' = 1 point. A mistake subtracts the row of points from the running score, and a correct answer adds the points for each square. Further, a multiplier is applied to correct answers: the first row of correct answers is worth x4, second row is x3, and so on. Guess the hard categories first for maximum score!
-        
-    </p>
-
-    <p>
-        <strong>Strands</strong><br>
-        Points range from 0 to ~135. '🟡' = 10 points, '🔵' = 5 points, and '💡' = -5 points. The position of the yellow dot also is taken into account. A blue word found before the spanagram is worth fewer points. To get max points, find the spanagram first!
-        
-    </p>
-
-    <p>
-        <strong>Wordle</strong><br>
-        Points range from 0 to 150. '⬜' = 5 points, '🟨' = 3 points, and '🟩' = 0 points. Each incorrect guess adds points, incorrect placement is worth fewer points. Guess the word with as few mistakes as possible and get the lowest score you can!
-        
-    </p>
-    <p>
-        <strong>Puzzle Scoring and Ranking</strong><br>
+        Each game has a custom scoring system with a minimum and maximum amount of points. Submit your puzzle results to see how you scored against other players. <br><br>
         The plots below depict the distribution of scores for recent puzzles. The rectangle represents the 75th and 25th quartiles, and the black line shows the median of the distribution. The "whiskers" on top and bottom mark the end points of the distribution. A blue dot depicts the score submitted by the viewer. A puzzle's difficulty ranking is calculated using parameters of the score distribution.<br><br>
-       
-<!--         The puzzle's "rank" is a difficulty rating calculated using the parameters of the score distribution. <strong>&mu;</strong> is the mean score and <strong>&sigma;</strong> is the standard deviation of scores. These parameters are adjusted with weights <strong>&alpha;</strong> and <strong>&beta;</strong> to assign priority to the distribution mean and variance. A skew factor <strong>&delta;</strong> adjusts the difficulty for outliers. -->
+        <a href="#details">Read More</a><br>
+        <a href="https://simonhansedasi.github.io/game_ranking">View on GitHub</a>
+
     </p>
-<!--     <p>For Wordle, difficulty of the puzzle can be thought of as increasing with the score. The difficulty of Wordle puzzles is quantified as follows,
-    <p class="equation">
-        D = &delta;
-        [
-        &alpha; &mu; + &beta;         
-        <span class="fraction">
-            <span class="top">&sigma;</span>
-            <span class="bottom">&mu;</span>
-        </span> -->
-<!--         + 
-        <span class="fraction">
-            <span class="top">1</span>
-            <span class="bottom">n</span>
-        </span> -->
-<!--         ] -->
-<!--     </p> -->
-<!--     
-    <p>For Connections and Strands, lower scores indicate a harder puzzle, so the difficulty will increase inversely to the mean of the score distribution. A tiny decimal <strong>&gamma;</strong> is added to avoid dividing by zero. The difficulty of these puzzles is quantified as, 
-    <p class="equation">
-        D = &delta;
-        [
-        &alpha;
-        <span class="fraction">
-            <span class="top">1</span>
-            <span class="bottom">&mu; + &gamma;</span>
-        </span>
-        
-        + &beta;        
-        <span class="fraction">
-            <span class="top">&sigma;</span>
-            <span class="bottom">&mu;</span>
-        </span>
-<!--         + 
-        <span class="fraction">
-            <span class="top">1</span>
-            <span class="bottom">n</span>
-        </span> -->
-<!--         ] -->
-<!--     </p> -->
-    
+
     
     <p>
     <hr style="border: .5px solid grey; width: 80%;">
@@ -206,9 +148,75 @@
     <img id="wordlePlotImage" src="" alt="Recent Wordle Scores Plot" />
     </div>
     
-    
-    
+        
+    <p>
+    <hr style="border: .5px solid grey; width: 80%;">
+    <p>
+        
+            <h2 id = 'details'>Details</h2>
 
+        <p>
+        <strong>Connections</strong><br>
+        Points range from 0 to 180. '🟪' = 4 points, '🟦' = 3, '🟩' = 2, and '🟨' = 1 point. A mistake subtracts the row of points from the running score, and a correct answer adds the points for each square. Further, a multiplier is applied to correct answers: the first row of correct answers is worth x4, second row is x3, and so on. Guess the hard categories first for maximum score!
+        
+    </p>
+
+    <p>
+        <strong>Strands</strong><br>
+        Points range from 0 to ~135. '🟡' = 10 points, '🔵' = 5 points, and '💡' = -5 points. The position of the yellow dot also is taken into account. A blue word found before the spanagram is worth fewer points. To get max points, find the spanagram first!
+        
+    </p>
+
+    <p>
+        <strong>Wordle</strong><br>
+        Points range from 0 to 150. '⬜' = 5 points, '🟨' = 3 points, and '🟩' = 0 points. Each incorrect guess adds points, incorrect placement is worth fewer points. Guess the word with as few mistakes as possible and get the lowest score you can!
+        
+    </p>
+    <p>
+        <strong>Puzzle Scoring and Ranking</strong><br>
+        The plots below depict the distribution of scores for recent puzzles. The rectangle represents the 75th and 25th quartiles, and the black line shows the median of the distribution. The "whiskers" on top and bottom mark the end points of the distribution. A blue dot depicts the score submitted by the viewer. <br><br>
+
+        The puzzle's difficulty rank <strong>D</strong> is calculated with the mean score <strong>&mu;</strong>, score standard deviation <strong>&sigma;</strong>, and skewness of score distribution <strong>&delta;</strong>. <strong>&mu;</strong> would make for a decent ranking, however, the spread of the data is can also contribute to a difficulty ranking. Two puzzles can have a similar mean score, but a higher spread in the score data indicates a higher difficulty. <strong>&sigma;</strong> is considered in this case to increase or decrease the difficulty ranking. The coefficient of variation, <strong>&sigma;</strong> / <strong>&mu;</strong> is a unitless quantity that describes spread of a distribution to compare with other distributions. Finally, how the distributions are skewed, either towards high or low scores, is taken into account with <strong>&delta;</strong>. This helps score a distribution with outliers. 
+    </p>
+    <p>For Wordle, difficulty of the puzzle can be thought of as increasing with the score. The difficulty of Wordle puzzles is quantified as follows,
+    </p>
+    <p class="equation">
+        D = &delta;
+        [
+        &alpha; &mu; + &beta;         
+        <span class="fraction">
+            <span class="top">&sigma;</span>
+            <span class="bottom">&mu;</span>
+        </span>
+<!--         + 
+        <span class="fraction">
+            <span class="top">1</span>
+            <span class="bottom">n</span>
+        </span> -->
+        ]
+    </p>
+<p>For Connections and Strands, lower scores indicate a harder puzzle, so the difficulty will increase inversely to the mean of the score distribution. A tiny decimal <strong>&gamma;</strong> is added to avoid dividing by zero. The difficulty of these puzzles is quantified as, 
+    <p class="equation">
+        D = &delta;
+        [
+        &alpha;
+        <span class="fraction">
+            <span class="top">1</span>
+            <span class="bottom">&mu; + &gamma;</span>
+        </span>
+        
+        + &beta;        
+        <span class="fraction">
+            <span class="top">&sigma;</span>
+            <span class="bottom">&mu;</span>
+        </span>
+<!--         + 
+        <span class="fraction">
+            <span class="top">1</span>
+            <span class="bottom">n</span>
+        </span>  -->
+        ] 
+    </p>
   <script src="js/sess_id.js" defer></script>
   <script src="js/fetch_ranking.js" defer></script>
   <script src="js/submit_score.js" defer></script>
