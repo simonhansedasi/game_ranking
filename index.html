@@ -46,6 +46,38 @@
         max-width: 100%; /* Image cannot exceed the container's width */
         height: auto;   /* Maintain aspect ratio */
     }
+    
+    .equation {
+        font-family: 'Times New Roman', Times, serif;
+        font-style: italic;
+        text-align: center;
+        margin: 20px 0;
+    }
+
+    .fraction {
+        display: inline-block;
+        vertical-align: middle;
+        text-align: center;
+    }
+
+    .fraction span {
+        display: block;
+        padding: 0 5px;
+    }
+
+    .fraction .top {
+        border-bottom: 1px solid black;
+    }
+
+    .subscript {
+        vertical-align: sub;
+        font-size: 0.8em;
+    }
+
+    .superscript {
+        vertical-align: super;
+        font-size: 0.8em;
+    }
 </style>
 
 </head>
@@ -68,7 +100,7 @@
 
     <p>
         <strong>Strands</strong><br>
-        Points range from ~ -85 to ~40. '🟡' = 10 points, '🔵' = 5 points, and '💡' = -5 points. The position of the yellow dot also is taken into account. A blue word found before the spanagram is worth minus points. To get max points, find the spanagram first!
+        Points range from 0 to . '🟡' = 10 points, '🔵' = 5 points, and '💡' = -5 points. The position of the yellow dot also is taken into account. A blue word found before the spanagram is worth minus points. To get max points, find the spanagram first!
         
     </p>
 
@@ -80,9 +112,33 @@
     <p>
         <strong>Puzzle Scoring and Ranking</strong><br>
         The plots below depict the distribution of scores for recent puzzles. The rectangle represents the 75th and 25th quartiles, and the black line shows the median of the distribution. The "whiskers" on top and bottom mark the end points of the distribution. A blue dot depicts the score submitted by the viewer.<br><br>
-        The puzzle's "rank" is the mean of the distribution of scores.
+        The puzzle's "rank" is a difficulty rating calculated using the parameters of the score distribution. <strong>&mu;</strong> is the mean score, <strong>&sigma;<sup>2</sup></strong> is the variance of scores, and <strong>n</strong> is the number of scored puzzles.
     </p>
-
+    <p>For Wordle, difficulty of the puzzle can be thought of as increasing with the score. The difficulty of Wordle puzzles is quantified as follows,
+    <p class="equation">
+        D = &alpha; μ + &beta; σ<sup>2</sup> + 
+        <span class="fraction">
+            <span class="top">1</span>
+            <span class="bottom">n</span>
+        </span>
+    </p>
+    
+    <p>For Connections and Strands, lower scores indicate a harder puzzle, so the difficulty will increase inversely to the mean of the score distribution. The difficulty of these puzzles is quantified as, 
+    <p class="equation">
+        D = &alpha;
+        <span class="fraction">
+            <span class="top">1000</span>
+            <span class="bottom">&mu; + &gamma;</span>
+        </span>
+        
+        + &beta; σ<sup>2</sup> + 
+        <span class="fraction">
+            <span class="top">1</span>
+            <span class="bottom">n</span>
+        </span>
+    </p>
+    
+    
     
     <p>
     <hr style="border: .5px solid grey; width: 80%;">

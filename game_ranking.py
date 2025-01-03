@@ -68,7 +68,7 @@ strands_score_map = {
 
 def score_strands_puzzle(strands_string):
     # yellow_pos = []
-    score = 100
+    score = 85
     yellow_pos = len(strands_string)
     for index, emoji in enumerate(strands_string):
         # print(index)
@@ -89,7 +89,8 @@ def score_strands_puzzle(strands_string):
         elif emoji == '💡':
             # Light bulbs always subtract 5
             score += strands_score_map[emoji]
-    
+    if score < 0:
+        score = 0
     # print(f"Total score: {score}")
     return score
 
@@ -293,18 +294,29 @@ def update_ranking(game_type, puzzle_number):
     for item in rows:
         score = item[0]
         scores.append(score)
-
     m = np.mean(scores)
+    score_range = max(scores) - min(scores)
+    # print(score_range)
     var = np.var(scores)
     # print(m, var)
-    a = 1.5
-    b = 1
+    a = 20
+    b = .025
     n = len(scores)
-
+    
+    
     if game_type == 'wordle':
-        D = np.round((a * (m)) + (b * var) + (1/n))
+        alpha = a * m
+        beta = b * (var)
+        N = 1/n
+        
+        D = np.round(alpha + beta + N, 0)
+        
     else:
-        D = np.round((a * (1/m)) - (b * var) + (1/n))
+        alpha = a * (1000/(m + 1e-5))
+        beta = b * (var)
+        N = 1/n        
+        D = np.round(alpha + beta + N, 0)
+    # print(D)print
     cursor.execute('''
         INSERT INTO rankings (game_type, puzzle_number, ranking)
         VALUES (?, ?, ?)
@@ -413,6 +425,50 @@ def get_recent_scores(puzzle_number = None, db_file = 'rankings.db'):
     
     return rows, column_names
 
+
+
+
+def get_score_parameters(game_type):
+    rank = get_current_rank(game_type) 
+    
+    puzzles = []
+    for i in range(5):
+        if rank[i][1] == 0:
+            break
+            
+        puzzles.append(rank[i][1])
+
+    conn = sqlite3.connect('rankings.db')
+    cursor = conn.cursor()
+    
+    query = f'''
+        SELECT puzzle_number, score 
+        FROM puzzles WHERE puzzle_number IN ({','.join(['?'] * len(puzzles))})
+    '''
+    
+    cursor.execute(query, tuple(puzzles))
+    
+    results = cursor.fetchall()
+    conn.close()
+    score_dict = {}
+    for result in results:
+        if result[0] not in score_dict:
+            score_dict[result[0]] = []
+        score_dict[result[0]].append(result[1])
+    return score_dict
+
+
+def calculate_parameters(scores):
+
+    params = {}
+    for puzzle, scores in scores.items():
+        mu = np.round(np.mean(scores), 2)
+        
+        var = np.round(np.var(scores), 2)
+        
+        params[puzzle] = (mu, var)
+        
+    return params
 
 
 

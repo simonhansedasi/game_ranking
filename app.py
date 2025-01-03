@@ -163,13 +163,13 @@ def get_ranking():
 
     # Query the database to get the current ranking for the game type
     
-    row = gr.get_current_rank(game_type)
     
     
-    rank = (gr.get_current_rank(game_type))  # Implement this function to fetch the ranking
+    rank = gr.get_current_rank(game_type)  # Implement this function to fetch the ranking
     # while len(rank) < 5:
     #     rank.append((3, 0, 7))
-    print(rank)
+    # print(rank)
+    
     if rank is None:
         return jsonify({'error': 'No ranking data available'}), 404
     # Convert NumPy int64 to Python int
@@ -191,28 +191,24 @@ def get_ranking():
 
         path = gr.plot_score_data(wordle, game = 'wordle',session_id = session_id)
         
-
-    return jsonify(
-        {
-            'date1': str(rank[0][2]),
-            'puzz1': str(rank[0][1]),
-            'rank1': str(rank[0][0]),
-            'date2': str(rank[1][2]),
-            'puzz2': str(rank[1][1]),
-            'rank2': str(rank[1][0]),
-            'date3': str(rank[2][2]),
-            'puzz3': str(rank[2][1]),
-            'rank3': str(rank[2][0]),
-            'date4': str(rank[3][2]),
-            'puzz4': str(rank[3][1]),
-            'rank4': str(rank[3][0]),
-            
-            'date5': str(rank[4][2]),
-            'puzz5': str(rank[4][1]),
-            'rank5': str(rank[4][0]),
-            # "path" : f"/{path}"
-        }
+    params = gr.calculate_parameters(
+        gr.get_score_parameters(game_type)
     )
+    response = {}
+    for i, entry in enumerate(rank):
+        index = i + 1
+        puzzle_number = entry[1]
+
+        # Fetch mean and variance from the dictionary; default to (0, 0) if not found
+        mu, var = params.get(puzzle_number, (0, 0))
+
+        response[f'date{index}'] = str(entry[2])
+        response[f'puzz{index}'] = str(puzzle_number)
+        response[f'rank{index}'] = str(entry[0])
+        response[f'mu{index}'] = str(mu)
+        response[f'var{index}'] = str(var)
+
+    return jsonify(response)
 
 
 if __name__ == '__main__':
