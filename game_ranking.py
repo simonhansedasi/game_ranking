@@ -303,7 +303,8 @@ def update_ranking(game_type, puzzle_number):
     n = len(scores)
     skew_factor = 1 + (0.01 * skew)
     norm_var = np.sqrt(var) / (m)
-    
+    if n == 1:
+        skew_factor = 1
     
     if game_type == 'wordle':
         alpha = a * m
