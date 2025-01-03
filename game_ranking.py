@@ -61,7 +61,7 @@ def score_connections_puzzle(connections_string):
 
 strands_score_map = {
     '🟡' : 10,
-    '🔵' : 5,
+    '🔵' : 2,
     '💡' : -5
 }
 
@@ -95,6 +95,7 @@ def score_strands_puzzle(strands_string):
 
 
 wordle_score_map = {
+    '⬛' : 5,
     '⬜' : 5,
     '🟨' : 3,
     '🟩' : 0
