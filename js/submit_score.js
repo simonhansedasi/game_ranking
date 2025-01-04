@@ -40,6 +40,9 @@ function submitScore() {
                 scoreElement.innerHTML = `Your ${gameType} score: ${data.score}`;
                 plotImageElement.src = `${baseURL}/static/images/${gameType}_recent_scores.png?t=${Date.now()}`;
                 plotImageElement.style.display = 'block';
+                
+            fetchAndDisplayRanking(gameType, baseURL);
+
             })
             .catch(error => {
                 scoreElement.textContent = `Error: ${error.message}`;
