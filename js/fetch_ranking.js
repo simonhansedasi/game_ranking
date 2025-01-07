@@ -74,7 +74,7 @@ function fetchAndDisplayRank(gameType, baseURL) {
                     const dateKey = `date${i}`;
                     const muKey = `mu${i}`;
                     const varKey = `var${i}`;
-                    const nKey = `n{i}`;
+                    const nKey = `n${i}`;
                     
                     if (data[puzzleKey]) {
                         // Create a new div for each rank entry
