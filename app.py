@@ -200,13 +200,14 @@ def get_ranking():
         puzzle_number = entry[1]
 
         # Fetch mean and variance from the dictionary; default to (0, 0) if not found
-        mu, std = params.get(puzzle_number, (0, 0))
+        mu, std, n = params.get(puzzle_number, (0, 0, 0))
 
         response[f'date{index}'] = str(entry[2])
         response[f'puzz{index}'] = str(puzzle_number)
         response[f'rank{index}'] = str(entry[0])
         response[f'mu{index}'] = str(mu)
         response[f'var{index}'] = str(std)
+        response[f'n{index}'] = str(n)
 
     return jsonify(response)
 

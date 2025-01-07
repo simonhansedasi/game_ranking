@@ -302,7 +302,7 @@ def update_ranking(game_type, puzzle_number):
     b = 0.015
     n = len(scores)
     skew_factor = 1 + (0.01 * skew)
-    norm_var = np.sqrt(var) / (m)
+    norm_var = np.sqrt(var) / (m + gamma)
     if n == 1:
         skew_factor = 1
     
@@ -324,7 +324,7 @@ def update_ranking(game_type, puzzle_number):
         D = np.clip(D * 1000, 1, 10000)
     
     D = np.round(D, 2)
-    print(game_type, alpha, m,beta, skew_factor, D)
+    # print(game_type, alpha, m,beta, skew_factor, D)
     cursor.execute('''
         INSERT INTO rankings (game_type, puzzle_number, ranking)
         VALUES (?, ?, ?)
@@ -474,7 +474,9 @@ def calculate_parameters(scores):
         
         std = np.round(np.std(scores), 2)
         
-        params[puzzle] = (mu, std)
+        n = len(scores)
+        
+        params[puzzle] = (mu, std, n)
         
     return params
 
