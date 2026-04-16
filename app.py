@@ -16,7 +16,7 @@ app = Flask(__name__, static_folder='static')
 
 # CORS(app, support_credentials = True, resources={r'/*': {'origins': 'https://simonhansedasi.github.io'}})
 
-CORS(app, support_credentials = True, resources={r'/*': {'origins': ['https://02a885916215.ngrok.app','https://127.0.0.1:4000','https://simonhansedasi.github.io']}})
+CORS(app, support_credentials = True, resources={r'/*': {'origins': ['http://game-ranking.duckdns.org:5005','https://simonhansedasi.github.io']}})
 # CORS(app, support_credentials=True, resources={r'/*': {'origins': ['http://127.0.0.1:4000']}})
 
 # app.config['PREFERRED_URL_SCHEME'] = 'https'
@@ -49,7 +49,7 @@ def ensure_session_id():
     
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return jsonify({'status': 'Game Ranking API running'})
     
     
     
@@ -218,4 +218,4 @@ if __name__ == '__main__':
     gr.populate_puzzle_dates(game_type="connections", start_puzzle_number=550, start_date="2024-12-12", num_days=999)
     gr.populate_puzzle_dates(game_type="strands", start_puzzle_number=284, start_date="2024-12-12", num_days=999)
     gr.populate_puzzle_dates(game_type="wordle", start_puzzle_number=1292, start_date="2025-01-01", num_days=999)
-    app.run(debug=True, port = 5005)
+    app.run(host='0.0.0.0', port=5005)
