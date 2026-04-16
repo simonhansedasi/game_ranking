@@ -24,6 +24,8 @@ connections_score_map = {
     '🟦' : 3,
     '🟪' : 4
 }
+
+
 def clean_puzzle_input(puzzle_string):
 
     lines = puzzle_string.strip().split("\n")

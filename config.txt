@@ -1,1 +1,1 @@
-http://game-ranking.duckdns.org:5005
+https://game-ranking.duckdns.org
