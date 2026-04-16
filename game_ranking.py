@@ -26,24 +26,37 @@ connections_score_map = {
 }
 
 
+PUZZLE_EMOJIS = set('🟨🟩🟦🟪🟡🔵💡⬛⬜')
+
 def clean_puzzle_input(puzzle_string):
-
     lines = puzzle_string.strip().split("\n")
-    game = lines[0].split(" ")[0].lower()
+
+    game = None
+    game_line_idx = None
+    for i, line in enumerate(lines):
+        first_word = line.strip().split(" ")[0].lower()
+        if first_word in ('connections', 'strands', 'wordle'):
+            game = first_word
+            game_line_idx = i
+            break
+
+    if game is None:
+        raise ValueError("No recognized game found in message")
+
     if game == 'strands':
-        puzzle_number = lines[0].split("#")[1].strip().split()[0]
-        
+        puzzle_number = lines[game_line_idx].split("#")[1].strip().split()[0]
     if game == 'connections':
-        puzzle_number = lines[1].split("#")[1].strip()
-
+        puzzle_number = lines[game_line_idx + 1].split("#")[1].strip()
     if game == 'wordle':
-        puzzle_number = int(lines[0].split(" ")[1].strip().replace(',',''))
+        puzzle_number = int(lines[game_line_idx].split(" ")[1].strip().replace(',', ''))
 
-    skip = 2 if game == 'connections' else 1
-    puzzle_lines = [l for l in lines[skip:] if l.strip()]
+    skip = game_line_idx + 2 if game == 'connections' else game_line_idx + 1
+    puzzle_lines = [
+        l.strip() for l in lines[skip:]
+        if l.strip() and all(c in PUZZLE_EMOJIS for c in l.strip())
+    ]
 
     clean_puzzle_string = "\n".join(puzzle_lines)
-    
     return game, puzzle_number, clean_puzzle_string
 
 def score_connections_puzzle(connections_string):

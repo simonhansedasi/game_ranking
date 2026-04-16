@@ -89,7 +89,9 @@ def sms_reply():
         if game == 'connections':
             score = gr.score_connections_puzzle(clean_string)
         if game == 'strands':
-            score = gr.score_strands_puzzle(clean_string)  
+            score = gr.score_strands_puzzle(clean_string)
+        if game == 'wordle':
+            score = gr.score_wordle_puzzle(clean_string)
         response_message = f"Your score: {score}. Visit simonhansedasi.github.io/game_ranking to view more scores"
         gr.insert_score(game, puzzle_number, score, session_id = from_number)
         gr.update_ranking(game, puzzle_number)
