@@ -37,11 +37,8 @@ function submitScore() {
             })
             .then(response => response.json())
             .then(data => {
-                scoreElement.innerHTML = `Your ${gameType} score: ${data.score}`;
-                plotImageElement.src = `${baseURL}/static/images/${gameType}_recent_scores.png?t=${Date.now()}`;
-                plotImageElement.style.display = 'block';
-                fetchAndDisplayRank(gameType, baseURL);
-
+                scoreElement.innerHTML = `Your ${gameType} score: ${data.score}. Refreshing...`;
+                setTimeout(() => location.reload(), 2500);
             })
             .catch(error => {
                 scoreElement.textContent = `Error: ${error.message}`;

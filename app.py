@@ -112,7 +112,6 @@ def score_game():
     session_id = data.get('session_id')
     game, puzzle_number, clean_string = gr.clean_puzzle_input(game_string)
     if gr.score_exists(session_id, puzzle_number, game):
-        # print('no can do siree')
         return jsonify({'score': 'Score for this player and puzzle already submitted'}), 400
     
     
@@ -175,22 +174,6 @@ def get_ranking():
     # Convert NumPy int64 to Python int
     if isinstance(rank, (np.integer, np.floating)):
         rank = rank.item()
-    rows, col_names = gr.get_recent_scores()
-    strands, connecs, wordle = gr.organize_data(rows)
-    if game_type == 'connections':
-        connecs = gr.drop_old_scores(connecs)
-        path = gr.plot_score_data(connecs, game = 'connections',session_id = session_id)
-
-    if game_type == 'strands':
-        strands = gr.drop_old_scores(strands)
-
-        path = gr.plot_score_data(strands, game = 'strands',session_id = session_id)
-        
-    if game_type == 'wordle':
-        wordle = gr.drop_old_scores(wordle)
-
-        path = gr.plot_score_data(wordle, game = 'wordle',session_id = session_id)
-        
     params = gr.calculate_parameters(
         gr.get_score_parameters(game_type)
     )
@@ -199,7 +182,15 @@ def get_ranking():
         index = i + 1
         puzzle_number = entry[1]
 
-        # Fetch mean and variance from the dictionary; default to (0, 0) if not found
+        if puzzle_number is None:
+            response[f'date{index}'] = ''
+            response[f'puzz{index}'] = ''
+            response[f'rank{index}'] = ''
+            response[f'mu{index}'] = ''
+            response[f'var{index}'] = ''
+            response[f'n{index}'] = ''
+            continue
+
         mu, std, n = params.get(puzzle_number, (0, 0, 0))
 
         response[f'date{index}'] = str(entry[2])

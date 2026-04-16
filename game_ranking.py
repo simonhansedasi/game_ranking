@@ -31,17 +31,16 @@ def clean_puzzle_input(puzzle_string):
     lines = puzzle_string.strip().split("\n")
     game = lines[0].split(" ")[0].lower()
     if game == 'strands':
-        puzzle_number = lines[0].split("#")[1].strip()
+        puzzle_number = lines[0].split("#")[1].strip().split()[0]
         
     if game == 'connections':
         puzzle_number = lines[1].split("#")[1].strip()
-        
+
     if game == 'wordle':
         puzzle_number = int(lines[0].split(" ")[1].strip().replace(',',''))
 
-    # elif game != 'Strands' or 'Connections':
-    #     puzzle_number = None
-    puzzle_lines = lines[2:]
+    skip = 2 if game == 'connections' else 1
+    puzzle_lines = [l for l in lines[skip:] if l.strip()]
 
     clean_puzzle_string = "\n".join(puzzle_lines)
     
@@ -401,7 +400,7 @@ def get_current_rank(game_type):
     
     
     while len(row) < 5:
-        row.append((0, 0, '0'))
+        row.append((None, None, None))
 
     return row
 
@@ -528,7 +527,7 @@ def plot_score_data(data,game,session_id):
     
     if data == None:
         return
-    data = dict(sorted(data.items()))
+    data = dict(sorted(data.items(), key=lambda x: int(x[0])))
     
     data = drop_old_scores(data)
     

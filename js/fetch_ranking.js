@@ -92,9 +92,7 @@ function fetchAndDisplayRank(gameType, baseURL) {
                 document.getElementById(rankElementId).innerHTML = 'Puzzle not yet ranked';
             }
                 // Update the plot image
-            const timestamp = new Date().getTime();
-
-                plotImageElement.src = `${baseURL}/static/images/${gameType}_recent_scores.png?t=${timestamp}`;
+                plotImageElement.src = `${baseURL}/static/images/${gameType}_recent_scores.png`;
             })        .catch(error => {
                 console.error(`Error fetching ${gameType} ranking:`, error);
                 document.getElementById(rankElementId).innerHTML = 'Error fetching ranking.';
