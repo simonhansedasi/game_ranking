@@ -1,1 +1,16 @@
-https://game-ranking.duckdns.org
+[credentials]
+# --- Reddit scraper account (read-only, registered at reddit.com/prefs/apps) ---
+reddit_client_id     = YOUR_CLIENT_ID
+reddit_client_secret = YOUR_CLIENT_SECRET
+reddit_user_agent    = game_ranking_scraper/1.0 by u/YOUR_USERNAME
+
+# --- Bot Reddit account (separate account that posts summaries) ---
+bot_reddit_client_id     = BOT_CLIENT_ID
+bot_reddit_client_secret = BOT_CLIENT_SECRET
+bot_reddit_user_agent    = game_ranking_bot/1.0 by u/BOT_USERNAME
+bot_reddit_username      = BOT_REDDIT_USERNAME
+bot_reddit_password      = BOT_REDDIT_PASSWORD
+
+# --- Bot Bluesky account (separate account that posts summaries) ---
+bot_bluesky_handle   = vigcneiugh.bsky.social
+bot_bluesky_password = pro5-xh6f-hxbt-v52v
