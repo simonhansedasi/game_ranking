@@ -95,21 +95,6 @@ def serve_image(filename):
     return send_from_directory(os.path.join(app.static_folder, 'images'), filename)
 
 
-@app.route('/debug_db', methods=['GET'])
-def debug_db():
-    import sqlite3
-    conn = sqlite3.connect('rankings.db')
-    cursor = conn.cursor()
-    result = {}
-    for table in ['puzzles', 'rankings', 'puzzle_dates']:
-        cursor.execute(f'SELECT COUNT(*) FROM {table}')
-        count = cursor.fetchone()[0]
-        cursor.execute(f'SELECT * FROM {table} ORDER BY rowid DESC LIMIT 5')
-        rows = cursor.fetchall()
-        result[table] = {'count': count, 'recent': rows}
-    conn.close()
-    return jsonify(result)
-
 
 if __name__ == '__main__':
     gr.init_db()

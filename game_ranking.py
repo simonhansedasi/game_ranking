@@ -265,6 +265,8 @@ def update_ranking(game_type, puzzle_number, platform):
     gamma = 1
     var = var + gamma
     skew = st.skew(scores)
+    if not np.isfinite(skew):
+        skew = 0.0
 
     a = 1 if game_type == 'wordle' else 15
     b = 0.015
